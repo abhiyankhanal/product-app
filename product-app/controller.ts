@@ -1,7 +1,9 @@
-import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { Buffer } from 'buffer';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import AWS from 'aws-sdk';
+import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
+// import { Buffer } from 'buffer';
+// import sharp from 'sharp';
+// import { Readable } from 'stream';
 
 export const createProduct = async (
     event: APIGatewayProxyEvent,
@@ -97,13 +99,13 @@ export const uploadProductImage = async (event: APIGatewayProxyEvent, s3: S3Clie
 
         // Generate a unique key for this image
         const key = `original/${new Date().getTime()}.jpg`;
-
+        const bucketName = process.env?.BucketName ?? '20230820-product-image-bucket';
         // Remove the prefix 'data:image/jpeg;base64,' from the base64 string and convert to buffer
         const buffer = Buffer.from(image.replace(/^data:image\/jpeg;base64,/, ''), 'base64');
 
         // Define the S3 upload parameters
         const uploadParams: PutObjectCommandInput = {
-            Bucket: process.env?.BucketName ?? '20230819-product-image-bucket',
+            Bucket: bucketName,
             Key: key,
             Body: buffer,
             ContentType: 'image/jpeg',
@@ -132,3 +134,63 @@ export const uploadProductImage = async (event: APIGatewayProxyEvent, s3: S3Clie
         };
     }
 };
+
+// export const createThumbnail = async (bucket: string, key: string, s3: S3Client): Promise<Buffer> => {
+//     // Set your thumbnail preferences here
+//     const width = 200;
+//     const height = 200;
+
+//     try {
+//         // Fetch image from S3 and convert to buffer
+//         const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+//         const response = await s3.send(command);
+//         const imageBuffer = await getStream(response.Body as Readable); // assuming it is a Node.js readable stream
+
+//         // Resize image
+//         const outputBuffer = await sharp(imageBuffer).resize(width, height).jpeg().toBuffer();
+
+//         return outputBuffer;
+//     } catch (error) {
+//         console.error('Error creating thumbnail:', error);
+//         throw error;
+//     }
+// };
+
+// function getStream(stream: Readable): Promise<Buffer> {
+//     return new Promise((resolve, reject) => {
+//         const chunks: Uint8Array[] = [];
+//         stream
+//             .on('data', (chunk) => chunks.push(chunk))
+//             .on('error', reject)
+//             .on('end', () => resolve(Buffer.concat(chunks)));
+//     });
+// }
+
+// export const uploadOptimizedProductImage = async (
+//     s3: S3Client,
+//     uploadParams: { Bucket: string; Key: string },
+// ): Promise<APIGatewayProxyResult> => {
+//     try {
+//         // Generate and upload the thumbnail
+//         const thumbnail = await createThumbnail(uploadParams.Bucket, uploadParams.Key, s3);
+//         const thumbnailKey = `thumbnail/${new Date().getTime()}.jpg`;
+//         const thumbnailUploadParams = {
+//             Bucket: process.env?.BucketName ?? '20230820-product-image-bucket',
+//             Key: thumbnailKey,
+//             Body: thumbnail,
+//             ContentType: 'image/jpeg',
+//         };
+//         const thumbnailCommand = new PutObjectCommand(thumbnailUploadParams);
+//         await s3.send(thumbnailCommand);
+//         return {
+//             statusCode: 200,
+//             body: JSON.stringify({ message: 'Thumbnail creation success' }),
+//         };
+//     } catch (error) {
+//         console.error('Error uploading product image:', error);
+//         return {
+//             statusCode: 500,
+//             body: JSON.stringify({ message: 'Error uploading product image' }),
+//         };
+//     }
+// };

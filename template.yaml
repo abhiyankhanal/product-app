@@ -37,7 +37,7 @@ Resources:
         - S3ReadPolicy:
             BucketName: !Ref ProductImageBucket
         - S3WritePolicy:
-            BucketName: !Ref ProductImageBucket
+            BucketName: !Ref ProductOptimizedImageBucket
 
       CodeUri: product-app/
       Handler: index.lambdaHandler
@@ -79,7 +79,23 @@ Resources:
   ProductImageBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: 20230819-product-image-bucket
+      BucketName: 20230820-product-image-bucket
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  ProductOptimizedImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 20230820-product-optimized-image-bucket
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -96,23 +112,26 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: Event rule to trigger Lambda on S3 uploads
+      State: ENABLED
       EventPattern:
         source:
           - aws.s3
         detail-type:
-          - ObjectCreated:Put
-        resources:
-          - !GetAtt ProductImageBucket.Arn
+          - Object Created
+        detail:
+          bucket:
+            name:
+              - Fn::Sub: arn:aws:s3:::${ProductImageBucket}
       Targets:
         - Arn: !GetAtt ProductAppFunction.Arn
           Id: S3UploadLambdaTarget
 
   PermissionForEventsToInvokeLambda:
-    Type: "AWS::Lambda::Permission"
+    Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref ProductAppFunction
-      Action: "lambda:InvokeFunction"
-      Principal: "events.amazonaws.com"
+      FunctionName: !GetAtt ProductAppFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
       SourceArn: !GetAtt S3UploadEventRule.Arn
 
   ApplicationResourceGroup:
@@ -134,7 +153,7 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
 
   ProductAppFunction:
-    Description: Hello World Lambda Function ARN
+    Description: Product App Function ARN
     Value: !GetAtt ProductAppFunction.Arn
 
   ProductDynamoDBTable:
