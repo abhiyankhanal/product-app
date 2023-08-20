@@ -15,9 +15,10 @@ export const createProduct = async (
             .put({
                 TableName: process.env?.ProductTable ?? 'ProductTable',
                 Item: {
-                    ProductId: requestBody.productId,
-                    ProductName: requestBody.productName,
-                    ProductImageUri: '',
+                    productId: requestBody.productId,
+                    productName: requestBody.productName,
+                    productDescription: requestBody.description,
+                    productImageUri: '',
                 },
             })
             .promise();
@@ -62,13 +63,13 @@ export const deleteProduct = async (
     dynamoDB: AWS.DynamoDB.DocumentClient,
 ): Promise<APIGatewayProxyResult> => {
     try {
-        const productId = event.pathParameters?.productId;
+        const _productId = event.pathParameters?.productId;
 
         // Delete product from DynamoDB
         await dynamoDB
             .delete({
                 TableName: process.env?.ProductTable ?? 'ProductTable',
-                Key: { ProductId: productId },
+                Key: { productId: _productId },
             })
             .promise();
 
@@ -117,12 +118,12 @@ export const uploadProductImage = async (
                 TableName: process.env?.ProductTable ?? 'ProductTable',
                 Key: { productId: _productId },
                 ExpressionAttributeNames: {
-                    '#product_image_url': 'imageUrl',
+                    '#product_image_url': 'productImageUri', // The correct attribute name from the table
                 },
                 ExpressionAttributeValues: {
-                    ':imageUrl': imageUrl,
+                    ':productImageUri': imageUrl,
                 },
-                UpdateExpression: 'SET #product_image_url = :imageUrl',
+                UpdateExpression: 'SET #product_image_url = :productImageUri',
                 ReturnValues: 'ALL_NEW',
             };
 
