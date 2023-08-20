@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   simple-product-app
@@ -19,7 +19,7 @@ Resources:
       AttributeDefinitions:
         - AttributeName: ProductId
           AttributeType: S
-  
+
       KeySchema:
         - AttributeName: ProductId
           KeyType: HASH
@@ -43,24 +43,29 @@ Resources:
       Handler: index.lambdaHandler
       Runtime: nodejs16.x
       Architectures:
-      - x86_64
+        - x86_64
       Events:
-       CreateProductEvent:
+        CreateProductEvent:
           Type: Api
           Properties:
             Path: /product
             Method: POST
 
-       GetProductsEvent:
+        GetProductsEvent:
           Type: Api
           Properties:
             Path: /products
             Method: GET
-       DeleteProductEvent:
+        DeleteProductEvent:
           Type: Api
           Properties:
             Path: /product/{productId}
             Method: DELETE
+        UploadProductEvent:
+          Type: Api
+          Properties:
+            Path: /product/upload
+            Method: POST
 
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
@@ -69,12 +74,12 @@ Resources:
         Target: es2020
         # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
         EntryPoints:
-        - index.ts
+          - index.ts
 
   ProductImageBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-product-image-bucket
+      BucketName: 20230819-product-image-bucket
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -102,6 +107,13 @@ Resources:
         - Arn: !GetAtt ProductAppFunction.Arn
           Id: S3UploadLambdaTarget
 
+  PermissionForEventsToInvokeLambda:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !Ref ProductAppFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt S3UploadEventRule.Arn
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -115,26 +127,24 @@ Resources:
     Properties:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
+      AutoConfigurationEnabled: "true"
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   ProductAppApi:
     Description: API Gateway endpoint URL for Prod stage for Hello World function
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+
   ProductAppFunction:
     Description: Hello World Lambda Function ARN
     Value: !GetAtt ProductAppFunction.Arn
-  ProductAppFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt ProductAppFunctionRole.Arn
+
   ProductDynamoDBTable:
     Description: DynamoDB Table for storing products
     Value: !Ref ProductDynamoDBTable
+
   ProductImageBucketName:
     Description: Name of the product image bucket
     Value: !Ref ProductImageBucket
+
   S3UploadEventRuleArn:
     Description: ARN of the S3 upload EventBridge rule
     Value: !Ref S3UploadEventRule
