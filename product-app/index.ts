@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import { createProduct, deleteProduct, getAllProducts, uploadProductImage } from './controller';
+import { createProduct, createThumbnail, deleteProduct, getAllProducts, uploadProductImage } from './controller';
 import dynamodb from 'aws-sdk/clients/dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 
@@ -18,38 +18,55 @@ const dynamoDB = process.env?.AWS_SAM_LOCAL
       })
     : new dynamodb.DocumentClient();
 
-const s3 = new S3Client({ region: 'us-east-1' });
+const s3 = new S3Client({ region: process.env.Region ?? 'us-east-1' });
 
 export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> => {
     let response: Promise<APIGatewayProxyResult>;
+    const notFound = Promise.resolve({
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Path not found' }),
+    });
 
     if (event.httpMethod === 'POST' && event.path === '/product') {
-        console.log('inside product');
         response = createProduct(event, dynamoDB);
         return response;
     } else if (event.httpMethod === 'GET' && event.path === '/products') {
-        console.log('inside products');
         response = getAllProducts(dynamoDB);
         return response;
     } else if (event.httpMethod === 'DELETE' && event.path.startsWith('/product/')) {
-        console.log('inside edit');
         const productId = event.pathParameters?.productId;
         if (productId) {
             response = deleteProduct(event, dynamoDB);
             return response;
         }
     } else if (event.httpMethod === 'POST' && event.path === '/product/upload') {
-        response = uploadProductImage(event, s3);
+        response = uploadProductImage(event, s3, dynamoDB);
         return response;
     } else if (event.source === 'aws.s3') {
-        console.log(`Triggered by event`);
-        // const bucket = event.Records[0].s3.bucket.name;
-        // const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
-        // response = uploadOptimizedProductImage(s3, { Bucket: bucket, Key: key });
-        return Promise.resolve({
-            statusCode: 400,
-            body: JSON.stringify({ message: 'Path not found' }),
-        });
+        console.info('Reading options from event:\n');
+        const srcBucket = event.Records[0].s3.bucket.name;
+
+        // Object key may have spaces or unicode non-ASCII characters
+        const srcKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+        const dstBucket = srcBucket + '-resized';
+        const dstKey = 'resized-' + srcKey;
+
+        // Infer the image type from the file suffix
+        const typeMatch = srcKey.match(/\.([^.]*)$/);
+        if (!typeMatch) {
+            console.log('Could not determine the image type.');
+            return notFound;
+        }
+
+        // Check that the image type is supported
+        const imageType = typeMatch[1].toLowerCase();
+        if (imageType != 'jpg' && imageType != 'png') {
+            console.log(`Unsupported image type: ${imageType}`);
+            return notFound;
+        }
+
+        createThumbnail({ bucket: srcBucket, key: srcKey }, { bucket: dstBucket, key: dstKey }, s3);
+        return notFound;
     }
     return {
         statusCode: 400,

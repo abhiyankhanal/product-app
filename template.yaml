@@ -103,10 +103,10 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
+        BlockPublicAcls: false
         BlockPublicPolicy: true
         IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        RestrictPublicBuckets: false
 
   S3UploadEventRule:
     Type: AWS::Events::Rule
