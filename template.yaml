@@ -39,7 +39,7 @@ Resources:
         - S3WritePolicy:
             BucketName: !Ref ProductOptimizedImageBucket
 
-      CodeUri: product-app/
+      CodeUri: product-service/
       Handler: index.lambdaHandler
       Runtime: nodejs16.x
       Architectures:

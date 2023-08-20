@@ -20,7 +20,7 @@ resolve_s3 = true
 s3_prefix = "simple-product-app"
 region = "us-east-1"
 image_repositories = []
-profile = "root"
+profile = "plerion"
 
 [default.package.parameters]
 resolve_s3 = true
