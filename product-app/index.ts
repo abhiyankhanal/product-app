@@ -68,8 +68,5 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         createThumbnail({ bucket: srcBucket, key: srcKey }, { bucket: dstBucket, key: dstKey }, s3);
         return notFound;
     }
-    return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Path not found' }),
-    };
+    return notFound;
 };
