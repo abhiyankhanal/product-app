@@ -20,7 +20,7 @@ export const createProduct = async (
         // Save product data to DynamoDB
         await dynamoDB
             .put({
-                TableName: process.env?.ProductTable ?? 'ProductTable',
+                TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
                 Item: {
                     ProductId: requestBody?.productId ?? '0',
                     ProductName: requestBody.productName ?? '',
@@ -48,7 +48,7 @@ export const getAllProducts = async (dynamoDB: AWS.DynamoDB.DocumentClient): Pro
         // Retrieve all products from DynamoDB
         const result = await dynamoDB
             .scan({
-                TableName: process.env?.ProductTable ?? 'ProductTable',
+                TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
             })
             .promise();
 
@@ -75,7 +75,7 @@ export const deleteProduct = async (
         // Delete product from DynamoDB
         await dynamoDB
             .delete({
-                TableName: process.env?.ProductTable ?? 'ProductTable',
+                TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
                 Key: { ProductId: _productId },
             })
             .promise();
@@ -103,8 +103,8 @@ export const uploadProductImage = async (
         const image = requestBody.image;
         const productId = requestBody.productId;
 
-        const key = `original/${new Date().getTime()}.jpg`;
-        const bucketName = process.env?.BucketName ?? '20230820-product-image-bucket';
+        const key = `${new Date().getTime()}.jpg`;
+        const bucketName = process.env?.SOURCE_BUCKET_NAME ?? '20230820-product-image-bucket';
 
         // Remove the prefix 'data:image/jpeg;base64,' from the base64 string and convert to buffer
         const buffer = Buffer.from(image.replace(/^data:image\/jpeg;base64,/, ''), 'base64');
@@ -117,15 +117,15 @@ export const uploadProductImage = async (
         };
 
         // Form the URL of the uploaded image
-        const productImageUri = `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
+        const productImageUri = `https://${process.env.DESTINATION_BUCKET??'20230820-product-optimized-image-bucket'}.s3.amazonaws.com/resized-${uploadParams.Key}`;
 
         const command = new PutObjectCommand(uploadParams);
 
         await s3.send(command);
-        console.log('send to s3 success');
+        console.info(`succesfully uploaded original image to s3`)
 
         const params = {
-            TableName: process.env?.ProductTable ?? 'ProductTable',
+            TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
             Key: { ProductId: productId },
             ExpressionAttributeNames: {
                 '#Product_image_url': 'ProductImageUri',
@@ -139,10 +139,8 @@ export const uploadProductImage = async (
 
         try {
             const data = await dynamoDB.update(params).promise();
-            console.log(data);
-
-            console.info('Image uploaded successfully!');
-
+            console.log(`updated data to dynamo db`);
+            
             return {
                 statusCode: 200,
                 body: JSON.stringify({
@@ -162,105 +160,34 @@ export const uploadProductImage = async (
             };
         }
     } catch (error) {
-        console.error('Error sending to S3:', error);
+        console.error('Error while uploading original image:', error);
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: 'Error sending to S3',
+                message: 'Error:',
                 error: error,
             }),
         };
     }
 };
 
-// export const createThumbnail = async (
-//     source: { bucket: string; key: string },
-//     destination: { bucket: string; key: string },
-//     client: S3Client,
-// ) => {
-//     console.log('inside thumbnail creator');
-//     try {
-//         const params = {
-//             Bucket: source.bucket,
-//             Key: source.key,
-//         };
-//         console.log(`bucket: ${source.bucket} key: ${source.key}`);
-//         const response: GetObjectCommandOutput = await client.send(new GetObjectCommand(params));
-//         console.log('got image');
-//         const streamData = response.Body;
-
-//         if (!(streamData instanceof Readable)) {
-//             throw new Error('Unknown object stream type');
-//         }
-
-//         const convert = spawn('convert', [
-//             '-', // input from stdin
-//             '-thumbnail',
-//             '200x200^', // thumbnail via imagemagick
-//             '-', // output to stdout
-//         ]);
-//         console.log('converted');
-
-//         const outStreamToBuffer = new Promise<Buffer>((resolve) => {
-//             const chunks: Buffer[] = [];
-//             convert.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
-//             convert.stdout.on('end', () => resolve(Buffer.concat(chunks)));
-//         });
-//         console.log('stream to buffer done');
-
-//         // Pipe the image file data from the S3 get request into ImageMagick
-//         streamData.pipe(convert.stdin);
-//         console.log('stream pipe');
-
-//         const output_buffer = await outStreamToBuffer;
-//         console.log('output');
-
-//         const destparams = {
-//             Bucket: destination.bucket,
-//             Key: destination.key,
-//             Body: streamData,
-//             ContentType: 'image/jpeg',
-//         };
-//         console.log('dest param');
-
-//         await client.send(new PutObjectCommand(destparams));
-//         console.log('sent');
-
-//         console.info(
-//             'Successfully resized ' +
-//                 source.bucket +
-//                 '/' +
-//                 source.key +
-//                 ' and uploaded to ' +
-//                 destination.bucket +
-//                 '/' +
-//                 destination.bucket,
-//         );
-//     } catch (error) {
-//         console.log(error);
-//         return;
-//     }
-// };
-
 export const createThumbnail = async (
     source: { bucket: string; key: string },
     destination: { bucket: string; key: string },
     client: S3Client,
 ) => {
-    console.log('inside thumbnail creator');
+    console.info(`Generating thumbnail`);
 
     let content_buffer;
     let output_buffer;
     try {
         const objectData = await getObjectFromS3({ bucket: source.bucket, key: source.key }, client);
-        console.log('got image');
 
         const stream = objectData?.Body;
         if (stream instanceof Readable) {
             const data = [];
             for await (const chunk of stream) {
                 data.push(chunk);
-                console.log('pushing data..')
             }
             content_buffer = Buffer.concat(data);
         } else {
@@ -276,7 +203,7 @@ export const createThumbnail = async (
 
     try {
         output_buffer = await sharp(content_buffer).resize(width).toBuffer();
-        console.log('sharping..')
+        console.info('resizing....')
     } catch (error) {
         console.error(error);
         return;
@@ -285,7 +212,7 @@ export const createThumbnail = async (
     try {
         await putObjectToS3({ bucket: destination.bucket, key: destination.key }, output_buffer, client);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return;
     }
 
@@ -301,6 +228,7 @@ export const createThumbnail = async (
     );
 };
 
+// utilities functions
 const getObjectFromS3 = async (
     source: { bucket: string; key: string },
     client: S3Client,

@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import { createThumbnail, deleteProduct, getAllProducts, uploadProductImage } from './controller';
+import { createProduct, createThumbnail, deleteProduct, getAllProducts, uploadProductImage } from './controller';
 import dynamodb from 'aws-sdk/clients/dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 
@@ -28,14 +28,8 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
     });
 
     if (event.httpMethod === 'POST' && event.path === '/product') {
-        createThumbnail(
-            { bucket: '20230820-product-image-bucket', key: 'download.jpeg' },
-            { bucket: '20230820-product-optimized-image-bucket', key: 'download-thumbnail.jpeg' },
-            s3,
-        );
-        return notFound;
-        // response = createProduct(event, dynamoDB);
-        // return response;
+        response = createProduct(event, dynamoDB);
+        return response;
     } else if (event.httpMethod === 'GET' && event.path === '/products') {
         response = getAllProducts(dynamoDB);
         return response;
@@ -54,7 +48,7 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
 
         // Object key may have spaces or unicode non-ASCII characters
         const srcKey = decodeURIComponent(event.detail.object.key.replace(/\+/g, ' '));
-        const dstBucket = srcBucket + '-resized';
+        const dstBucket = process.env.DESTINATION_BUCKET??'20230820-product-optimized-image-bucket';
         const dstKey = 'resized-' + srcKey;
 
         // Infer the image type from the file suffix
