@@ -1,8 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import AWS from 'aws-sdk';
-import { S3Client, PutObjectCommand, PutObjectCommandInput, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+    S3Client,
+    PutObjectCommand,
+    PutObjectCommandInput,
+    GetObjectCommand,
+    GetObjectCommandOutput,
+} from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import sharp from 'sharp';
+import { spawn } from 'child_process';
 
 export const createProduct = async (
     event: APIGatewayProxyEvent,
@@ -15,10 +21,10 @@ export const createProduct = async (
             .put({
                 TableName: process.env?.ProductTable ?? 'ProductTable',
                 Item: {
-                    productId: requestBody.productId,
-                    productName: requestBody.productName,
-                    productDescription: requestBody.description,
-                    productImageUri: '',
+                    ProductId: requestBody?.productId ?? '0',
+                    ProductName: requestBody.productName ?? '',
+                    ProductDescription: requestBody.productDescription ?? '',
+                    ProductImageUri: requestBody.productImageUri ?? '',
                 },
             })
             .promise();
@@ -69,7 +75,7 @@ export const deleteProduct = async (
         await dynamoDB
             .delete({
                 TableName: process.env?.ProductTable ?? 'ProductTable',
-                Key: { productId: _productId },
+                Key: { ProductId: _productId },
             })
             .promise();
 
@@ -94,7 +100,7 @@ export const uploadProductImage = async (
     try {
         const requestBody = JSON.parse(event.body || '');
         const image = requestBody.image;
-        const _productId = requestBody.Id;
+        const productId = requestBody.productId;
 
         const key = `original/${new Date().getTime()}.jpg`;
         const bucketName = process.env?.BucketName ?? '20230820-product-image-bucket';
@@ -110,44 +116,58 @@ export const uploadProductImage = async (
         };
 
         // Form the URL of the uploaded image
-        const imageUrl = `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
+        const productImageUri = `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
 
         const command = new PutObjectCommand(uploadParams);
-        await s3.send(command).then(async () => {
-            const params = {
-                TableName: process.env?.ProductTable ?? 'ProductTable',
-                Key: { productId: _productId },
-                ExpressionAttributeNames: {
-                    '#product_image_url': 'productImageUri', // The correct attribute name from the table
-                },
-                ExpressionAttributeValues: {
-                    ':productImageUri': imageUrl,
-                },
-                UpdateExpression: 'SET #product_image_url = :productImageUri',
-                ReturnValues: 'ALL_NEW',
-            };
 
-            try {
-                const data = await dynamoDB.update(params).promise();
-                console.log(data);
-            } catch (err) {
-                console.error(err);
-            }
-        });
-        console.info('Image uploaded successfully!');
+        await s3.send(command);
+        console.log('send to s3 success');
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'Product image uploaded successfully',
-                imageUrl: imageUrl,
-            }),
+        const params = {
+            TableName: process.env?.ProductTable ?? 'ProductTable',
+            Key: { ProductId: productId },
+            ExpressionAttributeNames: {
+                '#Product_image_url': 'ProductImageUri',
+            },
+            ExpressionAttributeValues: {
+                ':ProductImageUri': productImageUri,
+            },
+            UpdateExpression: 'SET #Product_image_url = :ProductImageUri',
+            ReturnValues: 'ALL_NEW',
         };
+
+        try {
+            const data = await dynamoDB.update(params).promise();
+            console.log(data);
+
+            console.info('Image uploaded successfully!');
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    message: 'Product image uploaded successfully',
+                    imageUrl: productImageUri,
+                }),
+            };
+        } catch (err) {
+            console.error(err);
+
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    message: 'Error updating DynamoDB',
+                    error: err,
+                }),
+            };
+        }
     } catch (error) {
-        console.error('Error uploading product image:', error);
+        console.error('Error sending to S3:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: 'Error uploading product image' }),
+            body: JSON.stringify({
+                message: 'Error sending to S3',
+                error: error,
+            }),
         };
     }
 };
@@ -155,66 +175,68 @@ export const uploadProductImage = async (
 export const createThumbnail = async (
     source: { bucket: string; key: string },
     destination: { bucket: string; key: string },
-    s3: S3Client,
+    client: S3Client,
 ) => {
-    // Get the image from the source bucket. GetObjectCommand returns a stream.
-    let content_buffer: Buffer;
-    let output_buffer: Buffer;
+    console.log('inside thumbnail creator');
     try {
         const params = {
             Bucket: source.bucket,
             Key: source.key,
         };
-        const response = await s3.send(new GetObjectCommand(params));
-        const stream = response.Body;
+        console.log(`bucket: ${source.bucket} key: ${source.key}`);
+        const response: GetObjectCommandOutput = await client.send(new GetObjectCommand(params));
+        console.log('got image');
+        const streamData = response.Body;
 
-        // Convert stream to buffer to pass to sharp resize function.
-        if (stream instanceof Readable) {
-            const data = [];
-            for await (const chunk of stream) {
-                data.push(chunk);
-            }
-            content_buffer = Buffer.concat(data);
-        } else {
+        if (!(streamData instanceof Readable)) {
             throw new Error('Unknown object stream type');
         }
-    } catch (error) {
-        console.error(error);
-        return;
-    }
 
-    // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
-    const width = 200;
+        const convert = spawn('convert', [
+            '-', // input from stdin
+            '-thumbnail',
+            '200x200^', // thumbnail via imagemagick
+            '-', // output to stdout
+        ]);
+        console.log('converted');
 
-    try {
-        output_buffer = await sharp(content_buffer).resize(width).toBuffer();
-    } catch (error) {
-        console.error(error);
-        return;
-    }
+        const outStreamToBuffer = new Promise<Buffer>((resolve) => {
+            const chunks: Buffer[] = [];
+            convert.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
+            convert.stdout.on('end', () => resolve(Buffer.concat(chunks)));
+        });
+        console.log('stream to buffer done');
 
-    try {
+        // Pipe the image file data from the S3 get request into ImageMagick
+        streamData.pipe(convert.stdin);
+        console.log('stream pipe');
+
+        const output_buffer = await outStreamToBuffer;
+        console.log('output');
+
         const destparams = {
             Bucket: destination.bucket,
             Key: destination.key,
             Body: output_buffer,
-            ContentType: 'image',
+            ContentType: 'image/jpeg',
         };
+        console.log('dest param');
 
-        await s3.send(new PutObjectCommand(destparams));
+        await client.send(new PutObjectCommand(destparams));
+        console.log('sent');
+
+        console.info(
+            'Successfully resized ' +
+                source.bucket +
+                '/' +
+                source.key +
+                ' and uploaded to ' +
+                destination.bucket +
+                '/' +
+                destination.bucket,
+        );
     } catch (error) {
         console.log(error);
         return;
     }
-
-    console.info(
-        'Successfully resized ' +
-            source.bucket +
-            '/' +
-            source.key +
-            ' and uploaded to ' +
-            destination.bucket +
-            '/' +
-            destination.bucket,
-    );
 };

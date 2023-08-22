@@ -28,6 +28,12 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
     });
 
     if (event.httpMethod === 'POST' && event.path === '/product') {
+        // createThumbnail(
+        //     { bucket: '20230820-product-image-bucket', key: 'original/1692626589564.jpg' },
+        //     { bucket: '20230820-product-optimized-image-bucket', key: 'download-thumbnail.jpg' },
+        //     s3,
+        // );
+        // return notFound;
         response = createProduct(event, dynamoDB);
         return response;
     } else if (event.httpMethod === 'GET' && event.path === '/products') {
@@ -43,11 +49,11 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         response = uploadProductImage(event, s3, dynamoDB);
         return response;
     } else if (event.source === 'aws.s3') {
-        console.info('Reading options from event:\n');
-        const srcBucket = event.Records[0].s3.bucket.name;
+        console.info(`Reading options from event:\n ${JSON.stringify(event)}`);
+        const srcBucket = event.detail.bucket.name;
 
         // Object key may have spaces or unicode non-ASCII characters
-        const srcKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+        const srcKey = decodeURIComponent(event.detail.object.key.replace(/\+/g, ' '));
         const dstBucket = srcBucket + '-resized';
         const dstKey = 'resized-' + srcKey;
 
@@ -60,7 +66,7 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
 
         // Check that the image type is supported
         const imageType = typeMatch[1].toLowerCase();
-        if (imageType != 'jpg' && imageType != 'png') {
+        if (imageType != 'jpg' && imageType != 'jpeg') {
             console.log(`Unsupported image type: ${imageType}`);
             return notFound;
         }

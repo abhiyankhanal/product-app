@@ -28,6 +28,15 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
+  ProductDependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: product-dependencies-layer
+      Description: Dependencies for the product service
+      ContentUri: dependencies/nodejs/
+      CompatibleRuntimes:
+        - nodejs16.x
+
   ProductAppFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -37,8 +46,12 @@ Resources:
         - S3ReadPolicy:
             BucketName: !Ref ProductImageBucket
         - S3WritePolicy:
+            BucketName: !Ref ProductImageBucket
+        - S3WritePolicy:
             BucketName: !Ref ProductOptimizedImageBucket
 
+      Layers:
+        - !Ref ProductDependenciesLayer
       CodeUri: product-service/
       Handler: index.lambdaHandler
       Runtime: nodejs16.x
@@ -121,7 +134,7 @@ Resources:
         detail:
           bucket:
             name:
-              - Fn::Sub: arn:aws:s3:::${ProductImageBucket}
+              - !Ref ProductImageBucket 
       Targets:
         - Arn: !GetAtt ProductAppFunction.Arn
           Id: S3UploadLambdaTarget
@@ -129,7 +142,7 @@ Resources:
   PermissionForEventsToInvokeLambda:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt ProductAppFunction.Arn
+      FunctionName: !Ref ProductAppFunction
       Action: lambda:InvokeFunction
       Principal: events.amazonaws.com
       SourceArn: !GetAtt S3UploadEventRule.Arn
@@ -148,9 +161,21 @@ Resources:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: "true"
 Outputs:
-  ProductAppApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  CreateProductApi:
+    Description: "Create API endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product"
+
+  GetProductsApi:
+    Description: "Get API endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/products"
+
+  DeleteProductApi:
+    Description: "Delete API endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/{productId}"
+
+  UploadProductApi:
+    Description: "Upload API endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/upload"
 
   ProductAppFunction:
     Description: Product App Function ARN
