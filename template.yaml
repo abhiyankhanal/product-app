@@ -1,15 +1,18 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  simple-product-app
-
-  Sample SAM Template for simple-product-app
+Description: Sample SAM Template for simple-product-app
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
     MemorySize: 128
+
+  Api:
+    Cors:
+      AllowOrigin: "'*'"
+      AllowMethods: "'OPTIONS,GET,PUT,POST,DELETE'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
 
 Resources:
   ProductDynamoDBTable:
@@ -28,14 +31,14 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
-  ProductDependenciesLayer:
+  ImageProcessingLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: product-dependencies-layer
-      Description: Dependencies for the product service
-      ContentUri: dependencies/nodejs/
+      LayerName: image-processing-layer
+      Description: Layer for sharp dependency
+      ContentUri: ./dependencies
       CompatibleRuntimes:
-        - nodejs16.x
+        - nodejs18.x
 
   ProductAppFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -51,7 +54,7 @@ Resources:
             BucketName: !Ref ProductOptimizedImageBucket
 
       Layers:
-        - !Ref ProductDependenciesLayer
+        - !Ref ImageProcessingLayer
       CodeUri: product-service/
       Handler: index.lambdaHandler
       Runtime: nodejs16.x
@@ -88,6 +91,8 @@ Resources:
         # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
         EntryPoints:
           - index.ts
+        External:
+          - "sharp"
 
   ProductImageBucket:
     Type: AWS::S3::Bucket
@@ -160,6 +165,7 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: "true"
+  
 Outputs:
   CreateProductApi:
     Description: "Create API endpoint URL for Prod stage"

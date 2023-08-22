@@ -8,3 +8,650 @@ profile = "root"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
+
+{
+  "$metadata": {
+    "httpStatusCode": 200,
+    "requestId": "4b7b7a00-2312-4000-96a9-156f767c27fa",
+    "attempts": 1,
+    "totalRetryDelay": 0
+  },
+  "partial": false,
+  "policies": [
+    {
+      "document": {
+        "Statement": [
+          {
+            "Action": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "Resource": [
+              "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+              "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*"
+            ],
+            "Effect": "Allow"
+          }
+        ]
+      },
+      "name": "ProductAppFunctionRolePolicy0",
+      "type": "inline"
+    },
+    {
+      "document": {
+        "Statement": [
+          {
+            "Action": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:GetLifecycleConfiguration"
+            ],
+            "Resource": [
+              "arn:aws:s3:::20230820-product-image-bucket",
+              "arn:aws:s3:::20230820-product-image-bucket/*"
+            ],
+            "Effect": "Allow"
+          }
+        ]
+      },
+      "name": "ProductAppFunctionRolePolicy1",
+      "type": "inline"
+    },
+    {
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:PutLogEvents",
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::*/*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::*/*"
+          }
+        ]
+      },
+      "name": "ProductAppFunctionRolePolicy2",
+      "type": "inline"
+    },
+    {
+      "document": {
+        "Statement": [
+          {
+            "Action": [
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:PutLifecycleConfiguration"
+            ],
+            "Resource": [
+              "arn:aws:s3:::20230820-product-optimized-image-bucket",
+              "arn:aws:s3:::20230820-product-optimized-image-bucket/*"
+            ],
+            "Effect": "Allow"
+          }
+        ]
+      },
+      "name": "ProductAppFunctionRolePolicy3",
+      "type": "inline"
+    },
+    {
+      "arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+          }
+        ]
+      },
+      "id": "ANPAJNCQGXC42545SKXIK",
+      "name": "AWSLambdaBasicExecutionRole",
+      "type": "managed"
+    }
+  ],
+  "resources": {
+    "dynamodb": {
+      "service": {
+        "icon": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjQgNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgdHJhbnNmb3JtPSJzY2FsZSguOCkiPgogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgPHBhdGggZD0iTTAgMGg4MHY4MEgweiIgZmlsbD0iI0M5MjVEMSIvPgogICAgICA8cGF0aCBkPSJNNTIuMDg2IDU0Ljg1Yy0zLjMzOCAyLjY5OS0xMC4zNDEgNC4xMjUtMTcuMDQyIDQuMTI1LTYuNzAyIDAtMTMuNzA3LTEuNDI3LTE3LjA0NC00LjEyNnY1LjQzNmguMDAxYzAgMi43MSA2Ljk5OSA1LjczMSAxNy4wNDMgNS43MzEgMTAuMDM2IDAgMTcuMDMxLTMuMDE3IDE3LjA0Mi01LjcyNnYtNS40NHptLjAwMS0xMC4zMjhsMi0uMDF2LjAxYzAgMS4yMDgtLjYwNSAyLjMzNi0xLjc4MyAzLjM2OSAxLjQyOCAxLjI1NiAxLjc4MyAyLjQ4OSAxLjc4MyAzLjM2N2wtLjAwMS4wMTd2OS4wMWMwIDUuMDEtOS44MTEgNy43MTUtMTkuMDQyIDcuNzE1LTkuMjA5IDAtMTguOTk0LTIuNjkzLTE5LjA0MS03LjY4IDAtLjAwNi0uMDAzLS4wMS0uMDAzLS4wMTZ2LTkuMDVsLjAwMi0uMDA3Yy4wMDMtLjg3OC4zNTktMi4xMDYgMS43ODUtMy4zNi0xLjQxNy0xLjI1MS0xLjc3Ny0yLjQ3Mi0xLjc4Ni0zLjM0M2guMDAxbC0uMDAyLS4wMXYtOS4wNWwuMDAyLS4wMWMuMDAzLS44NzcuMzYtMi4xMDUgMS43ODYtMy4zNTctMS40MTgtMS4yNTItMS43NzgtMi40NzQtMS43ODctMy4zNDRoLjAwMUwxNiAyOC43NnYtOS4wNDhsLjAwMi0uMDFDMTYuMDE5IDE0LjcgMjUuODIgMTIgMzUuMDQ0IDEyYzUuMjExIDAgMTAuMjE3LjgyOCAxMy43MzQgMi4yNzJsLS43NjUgMS44MzNjLTMuMjgzLTEuMzQ4LTguMDEtMi4xMjEtMTIuOTY5LTIuMTIxLTEwLjA0NCAwLTE3LjA0MyAzLjAyLTE3LjA0MyA1LjczMyAwIDIuNzEyIDYuOTk5IDUuNzMzIDE3LjA0MyA1LjczMy4yNzEuMDAzLjUzNiAwIC44MDQtLjAxbC4wODQgMS45ODJjLS4yOTYuMDEyLS41OTIuMDEyLS44ODguMDEyLTYuNzAyIDAtMTMuNzA3LTEuNDI3LTE3LjA0NC00LjEyNnY1LjQzMmguMDAxdi4wMjNjLjAxIDEuMDQgMS4wNzcgMS45NDkgMS45NzEgMi41MjYgMi42OSAxLjcxNSA3LjUxIDIuODg2IDEyLjg4NSAzLjEzbC0uMDkxIDEuOTgxYy01LjQ0NS0uMjQ3LTEwLjIxMy0xLjM3Ny0xMy4yODItMy4xMDgtLjc1Ni41NjUtMS40ODMgMS4zMy0xLjQ4MyAyLjE5NyAwIDIuNzExIDYuOTk5IDUuNzMyIDE3LjA0MyA1LjczMi45ODUgMCAxLjk2My0uMDMyIDIuOTA4LS4wOThsLjEzOSAxLjk3OWMtLjk5LjA2OC0yLjAxNi4xMDMtMy4wNDcuMTAzLTYuNzAyIDAtMTMuNzA3LTEuNDI3LTE3LjA0NC00LjEyNnY1LjQzMmguMDAxYy4wMSAxLjA2NCAxLjA3NyAxLjk3MSAxLjk3MSAyLjU1IDMuMDc2IDEuOTYyIDguODUyIDMuMTg0IDE1LjA3MiAzLjE4NGguNDR2MS45ODRoLS40NGMtNi4zMTkgMC0xMi4wNjItMS4xNzQtMTUuNTc0LTMuMTU2LS43NTIuNTY0LTEuNDY5IDEuMzI1LTEuNDY5IDIuMTg1IDAgMi43MTIgNi45OTkgNS43MzQgMTcuMDQzIDUuNzM0IDEwLjAzNiAwIDE3LjAzMS0zLjAxOCAxNy4wNDItNS43Mjd2LS4wMTFjLS4wMDItLjg2Mi0uNzIyLTEuNjIzLTEuNDc2LTIuMTg3LS40ODguMjc3LTEuMDExLjU0My0xLjYwNi43ODhsLS43NjYtMS44MzNjLjcyNi0uMjk4IDEuMzU2LS42MiAxLjg3My0uOTYuOTAyLS41ODggMS45NzYtMS41MDcgMS45NzYtMi41NHptOC41NjYtMTQuNTA1aC01LjYwNGExIDEgMCAwMS0uODI3LS40MzUuOTgyLjk4MiAwIDAxLS4xMDMtLjkyMmwzLjQwOS04LjUyMkg0NC42MTlsLTYgMTEuOTAyaDYuMzgyYy4zMTkgMCAuNjE5LjE1Mi44MDguNDA3YS45ODkuOTg5IDAgMDEuMTQ1Ljg4Nkw0MC4yNTggNTEuMDlsMjAuMzk1LTIxLjA3MnptMy4wNjktLjMwNUwzOC43MjMgNTUuNTRhMS4wMDYgMS4wMDYgMCAwMS0xLjIzMy4xNjUuOTg4Ljk4OCAwIDAxLS40NDItMS4xNTNsNi41ODYtMjAuNTI4aC02LjYzM2MtLjM0NyAwLS42NjgtLjE3OC0uODUxLS40N2EuOTgzLjk4MyAwIDAxLS4wNDMtLjk2NWw3LTEzLjg4NmExIDEgMCAwMS44OTQtLjU0OWgxNWMuMzMgMCAuNjQyLjE2NC44MjcuNDM1YS45ODQuOTg0IDAgMDEuMTAzLjkyM2wtMy40MSA4LjUyMUg2M2MuNCAwIC43NjMuMjM4LjkyLjYwM2EuOTg3Ljk4NyAwIDAxLS4xOTggMS4wNzZ6TTE5LjQ1NSA2MC42NzRjMS40MTcuNzk5IDMuMjAxIDEuNDcgNS4zMDIgMS45OTRsLjQ4OC0xLjkyNGMtMS44OTktLjQ3My0zLjU1OS0xLjA5NC00LjgwMi0xLjc5NGwtLjk4OCAxLjcyNHpNMjQuNzU3IDQ2LjhsLjQ4OC0xLjkyNGMtMS44OTktLjQ3NC0zLjU1OS0xLjA5NS00LjgwMi0xLjc5NWwtLjk4OCAxLjcyNWMxLjQxNy43OTggMy4yIDEuNDcgNS4zMDIgMS45OTR6bS01LjMwMi0xNy44NjNsLjk4OC0xLjcyNWMxLjI0MS43IDIuOTAyIDEuMzIgNC44MDIgMS43OTVsLS40ODggMS45MjNjLTIuMTA0LS41MjUtMy44ODctMS4xOTYtNS4zMDItMS45OTN6IiBmaWxsPSIjRkZGIi8+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4K",
+        "name": "Amazon DynamoDB"
+      },
+      "statements": [
+        {
+          "action": "dynamodb:GetItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:GetItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:DeleteItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:DeleteItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:PutItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:PutItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:Scan",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:Scan",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:Query",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:Query",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:UpdateItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:UpdateItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:BatchWriteItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:BatchWriteItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:BatchGetItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:BatchGetItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:DescribeTable",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:DescribeTable",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:ConditionCheckItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "dynamodb:ConditionCheckItem",
+          "effect": "Allow",
+          "resource": "arn:aws:dynamodb:us-east-1:180469254691:table/ProductTable/index/*",
+          "service": "dynamodb",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy0",
+            "policyType": "inline"
+          }
+        }
+      ]
+    },
+    "s3": {
+      "service": {
+        "icon": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjQgNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgdHJhbnNmb3JtPSJzY2FsZSguOCkiPgogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgPHBhdGggZD0iTTAgMGg4MHY4MEgweiIgZmlsbD0iIzdBQTExNiIvPgogICAgICA8cGF0aCBkPSJNNjAuODM2IDQyLjg5M2wuMzg0LTIuNzA0YzMuNTQgMi4xMiAzLjU4NyAyLjk5NyAzLjU4NiAzLjAyLS4wMDYuMDA2LS42MS41MS0zLjk3LS4zMTZ6bS0xLjk0My0uNTRDNTIuNzczIDQwLjUgNDQuMjUgMzYuNTkgNDAuOCAzNC45NmMwLS4wMTQuMDA0LS4wMjcuMDA0LS4wNDFhMi40MDYgMi40MDYgMCAwMC0yLjQwNC0yLjQwMyAyLjQwNiAyLjQwNiAwIDAwLTIuNDAyIDIuNDAzIDIuNDA2IDIuNDA2IDAgMDAyLjQwMiAyLjQwM2MuNTgyIDAgMS4xMS0uMjE3IDEuNTI3LS41NjIgNC4wNTggMS45MiAxMi41MTUgNS43NzQgMTguNjggNy41OTRMNTYuMTcgNjEuNTZhLjk1NS45NTUgMCAwMC0uMDEuMTRjMCAxLjUxNi02LjcwNyA0LjI5OS0xNy42NjYgNC4yOTktMTEuMDc1IDAtMTcuODUzLTIuNzgzLTE3Ljg1My00LjI5OCAwLS4wNDYtLjAwMy0uMDkxLS4wMS0uMTM2bC01LjA5My0zNy4yMDdjNC40MDkgMy4wMzUgMTMuODkyIDQuNjQgMjIuOTYyIDQuNjQgOS4wNTYgMCAxOC41MjMtMS42IDIyLjk0LTQuNjI1bC0yLjU0NyAxNy45Nzl6TTE1IDIwLjQ3OEMxNS4wNzIgMTkuMTYyIDIyLjYzNCAxNCAzOC41IDE0YzE1Ljg2NCAwIDIzLjQyNyA1LjE2IDIzLjUgNi40Nzh2LjQ0OUM2MS4xMyAyMy44NzcgNTEuMzMgMjcgMzguNSAyN2MtMTIuODUyIDAtMjIuNjU3LTMuMTMyLTIzLjUtNi4wODd2LS40MzV6bTQ5IC4wMjJjMC0zLjQ2NS05LjkzNC04LjUtMjUuNS04LjVTMTMgMTcuMDM1IDEzIDIwLjVsLjA5NC43NTQgNS41NDggNDAuNTI0QzE4Ljc3NSA2Ni4zMSAzMC44NiA2OCAzOC40OTQgNjhjOS40NzIgMCAxOS41MzUtMi4xNzggMTkuNjY1LTYuMjJsMi4zOTYtMTYuODk2YzEuMzMzLjMxOSAyLjQzLjQ4MiAzLjMxLjQ4MiAxLjE4NCAwIDEuOTg0LS4yOSAyLjQ2OS0uODY3YTEuOTUgMS45NSAwIDAwLjQzNi0xLjY2Yy0uMjYtMS4zODMtMS45MDItMi44NzUtNS4yNDgtNC43ODRsMi4zNzYtMTYuNzYyTDY0IDIwLjV6IiBmaWxsPSIjRkZGIi8+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4K",
+        "name": "Amazon S3"
+      },
+      "statements": [
+        {
+          "action": "s3:GetObject",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetObject",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:ListBucket",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:ListBucket",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetBucketLocation",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetBucketLocation",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetObjectVersion",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetObjectVersion",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetLifecycleConfiguration",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetLifecycleConfiguration",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy1",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:GetObject",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::*/*",
+          "service": "s3",
+          "source": {
+            "index": "1",
+            "policyName": "ProductAppFunctionRolePolicy2",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutObject",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::*/*",
+          "service": "s3",
+          "source": {
+            "index": "2",
+            "policyName": "ProductAppFunctionRolePolicy2",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutObject",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-optimized-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy3",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutObject",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-optimized-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy3",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutObjectAcl",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-optimized-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy3",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutObjectAcl",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-optimized-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy3",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutLifecycleConfiguration",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-optimized-image-bucket",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy3",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "s3:PutLifecycleConfiguration",
+          "effect": "Allow",
+          "resource": "arn:aws:s3:::20230820-product-optimized-image-bucket/*",
+          "service": "s3",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy3",
+            "policyType": "inline"
+          }
+        }
+      ]
+    },
+    "logs": {
+      "service": {
+        "icon": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjQgNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgdHJhbnNmb3JtPSJzY2FsZSguOCkiPgogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgPHBhdGggZD0iTTAgMGg4MHY4MEgweiIgZmlsbD0iI0U3MTU3QiIvPgogICAgICA8cGF0aCBkPSJNNTUuMDYgNDYuNzc3YzAtMy45MDktMy4yMDItNy4wOS03LjEzOC03LjA5LTMuOTM1IDAtNy4xMzYgMy4xODEtNy4xMzYgNy4wOSAwIDMuOTEgMy4yIDcuMDkgNy4xMzYgNy4wOXM3LjEzNy0zLjE4IDcuMTM3LTcuMDltMi4wMSAwYzAgNS4wMTEtNC4xMDMgOS4wODctOS4xNDcgOS4wODctNS4wNDMgMC05LjE0Ny00LjA3Ni05LjE0Ny05LjA4NyAwLTUuMDEgNC4xMDQtOS4wODYgOS4xNDctOS4wODYgNS4wNDQgMCA5LjE0OCA0LjA3NiA5LjE0OCA5LjA4Nm04LjQ0IDEzLjY5N0w1OC41IDU0LjIwM2ExMy4wMzMgMTMuMDMzIDAgMDEtMS45NDcgMi4xNmw2Ljk5OCA2LjI3YTEuNDc0IDEuNDc0IDAgMDAyLjA2Ni0uMTA3IDEuNDUzIDEuNDUzIDAgMDAtLjEwOC0yLjA1Mm0tMTcuNTg4LTIuODEyYzYuMDQzIDAgMTAuOTU4LTQuODgzIDEwLjk1OC0xMC44ODVzLTQuOTE1LTEwLjg4NC0xMC45NTgtMTAuODg0Yy02LjA0MSAwLTEwLjk1NyA0Ljg4Mi0xMC45NTcgMTAuODg0IDAgNi4wMDIgNC45MTYgMTAuODg1IDEwLjk1NyAxMC44ODVtMTkuMTkgNi4yQTMuNDgzIDMuNDgzIDAgMDE2NC41MjkgNjVhMy40NzUgMy40NzUgMCAwMS0yLjMyMi0uODgzTDU0LjkzMSA1Ny42YTEyLjkzNSAxMi45MzUgMCAwMS03LjAwOSAyLjA2Yy03LjE1IDAtMTIuOTY3LTUuNzc5LTEyLjk2Ny0xMi44ODIgMC03LjEwMiA1LjgxNy0xMi44ODEgMTIuOTY3LTEyLjg4MSA3LjE1MSAwIDEyLjk2OSA1Ljc3OSAxMi45NjkgMTIuODgxIDAgMi4wMzgtLjQ5MiAzLjk2LTEuMzQ0IDUuNjc0bDcuMzA5IDYuNTRhMy40NDQgMy40NDQgMCAwMS4yNTYgNC44NzJNMjEuMjggMjkuMzkzYzAgLjUxOS4wMzIgMS4wMzYuMDk0IDEuNTM2YS45OTQuOTk0IDAgMDEtLjgyMyAxLjEwNmMtMi40NzIuNjM0LTYuNTQgMi41NTMtNi41NCA4LjMxIDAgNC4zNDggMi40MTMgNi43NDggNC40MzkgNy45OTYuNjkxLjQzMyAxLjUxLjY2NCAyLjM3My42NzNsMTIuMTIyLjAxMS0uMDAyIDEuOTk3LTEyLjEzMS0uMDFjLTEuMjQ2LS4wMTQtMi40MjgtLjM1MS0zLjQyOC0uOTc3QzE1LjM3NyA0OC43OTcgMTIgNDUuODkgMTIgNDAuMzQ1YzAtNi42ODMgNC42LTkuMTUzIDcuMy0xMC4wMjYtLjAyLS4zMDctLjAzLS42MTctLjAzLS45MjYgMC01LjQ2IDMuNzI4LTExLjEyMyA4LjY3Mi0xMy4xNzEgNS43ODItMi40MDcgMTEuOTA4LTEuMjE0IDE2LjM4NCAzLjE4OSAxLjM4OCAxLjM2NCAyLjUyOSAzLjAyIDMuNDA0IDQuOTM3YTYuNTA5IDYuNTA5IDAgMDE0LjE1NC0xLjUwMmMzLjAwMiAwIDYuMzgyIDIuMjY0IDYuOTg0IDcuMjE1IDIuODEyLjY0NCA4Ljc1MyAyLjg5NCA4Ljc1MyAxMC4zNjIgMCAyLjk4MS0uOTQxIDUuNDQ0LTIuNzk4IDcuMzE5bC0xLjQzMy0xLjQwMWMxLjQ3My0xLjQ4OCAyLjIyLTMuNDc5IDIuMjItNS45MTggMC02LjUzMi01LjUwNC04LjE1Ny03Ljg3My04LjU1MWExLjAwMiAxLjAwMiAwIDAxLS44MjMtMS4xNTdjLS4zMjktNC4wNTUtMi43NTMtNS44NzItNS4wMy01Ljg3Mi0xLjQzNyAwLTIuNzg0LjY5NS0zLjY5NyAxLjkwN2ExLjAwNiAxLjAwNiAwIDAxLTEuNzUtLjI1OGMtLjgyMy0yLjI2Ni0yLjAxLTQuMTcxLTMuNTI1LTUuNjYxLTMuODgtMy44MTYtOS4xODQtNC44NS0xNC4xOTUtMi43NjYtNC4xNyAxLjcyNy03LjQzNyA2LjcwMi03LjQzNyAxMS4zMjgiIGZpbGw9IiNGRkYiLz4KICAgIDwvZz4KICA8L2c+Cjwvc3ZnPgo=",
+        "name": "Amazon CloudWatch Logs"
+      },
+      "statements": [
+        {
+          "action": "logs:PutLogEvents",
+          "effect": "Allow",
+          "resource": "arn:aws:logs:*:*:*",
+          "service": "logs",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy2",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "logs:CreateLogGroup",
+          "effect": "Allow",
+          "resource": "arn:aws:logs:*:*:*",
+          "service": "logs",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy2",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "logs:CreateLogStream",
+          "effect": "Allow",
+          "resource": "arn:aws:logs:*:*:*",
+          "service": "logs",
+          "source": {
+            "index": "0",
+            "policyName": "ProductAppFunctionRolePolicy2",
+            "policyType": "inline"
+          }
+        },
+        {
+          "action": "logs:CreateLogGroup",
+          "effect": "Allow",
+          "resource": "*",
+          "service": "logs",
+          "source": {
+            "index": "0",
+            "policyName": "AWSLambdaBasicExecutionRole",
+            "policyType": "managed"
+          }
+        },
+        {
+          "action": "logs:CreateLogStream",
+          "effect": "Allow",
+          "resource": "*",
+          "service": "logs",
+          "source": {
+            "index": "0",
+            "policyName": "AWSLambdaBasicExecutionRole",
+            "policyType": "managed"
+          }
+        },
+        {
+          "action": "logs:PutLogEvents",
+          "effect": "Allow",
+          "resource": "*",
+          "service": "logs",
+          "source": {
+            "index": "0",
+            "policyName": "AWSLambdaBasicExecutionRole",
+            "policyType": "managed"
+          }
+        }
+      ]
+    }
+  },
+  "roleName": "simple-product-app-ProductAppFunctionRole-1UHJ2Q0M0TVJP",
+  "trustedEntities": [
+    "lambda.amazonaws.com"
+  ]
+}

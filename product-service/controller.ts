@@ -6,9 +6,10 @@ import {
     PutObjectCommandInput,
     GetObjectCommand,
     GetObjectCommandOutput,
+    GetObjectCommandInput,
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import { spawn } from 'child_process';
+import sharp from 'sharp';
 
 export const createProduct = async (
     event: APIGatewayProxyEvent,
@@ -172,71 +173,164 @@ export const uploadProductImage = async (
     }
 };
 
+// export const createThumbnail = async (
+//     source: { bucket: string; key: string },
+//     destination: { bucket: string; key: string },
+//     client: S3Client,
+// ) => {
+//     console.log('inside thumbnail creator');
+//     try {
+//         const params = {
+//             Bucket: source.bucket,
+//             Key: source.key,
+//         };
+//         console.log(`bucket: ${source.bucket} key: ${source.key}`);
+//         const response: GetObjectCommandOutput = await client.send(new GetObjectCommand(params));
+//         console.log('got image');
+//         const streamData = response.Body;
+
+//         if (!(streamData instanceof Readable)) {
+//             throw new Error('Unknown object stream type');
+//         }
+
+//         const convert = spawn('convert', [
+//             '-', // input from stdin
+//             '-thumbnail',
+//             '200x200^', // thumbnail via imagemagick
+//             '-', // output to stdout
+//         ]);
+//         console.log('converted');
+
+//         const outStreamToBuffer = new Promise<Buffer>((resolve) => {
+//             const chunks: Buffer[] = [];
+//             convert.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
+//             convert.stdout.on('end', () => resolve(Buffer.concat(chunks)));
+//         });
+//         console.log('stream to buffer done');
+
+//         // Pipe the image file data from the S3 get request into ImageMagick
+//         streamData.pipe(convert.stdin);
+//         console.log('stream pipe');
+
+//         const output_buffer = await outStreamToBuffer;
+//         console.log('output');
+
+//         const destparams = {
+//             Bucket: destination.bucket,
+//             Key: destination.key,
+//             Body: streamData,
+//             ContentType: 'image/jpeg',
+//         };
+//         console.log('dest param');
+
+//         await client.send(new PutObjectCommand(destparams));
+//         console.log('sent');
+
+//         console.info(
+//             'Successfully resized ' +
+//                 source.bucket +
+//                 '/' +
+//                 source.key +
+//                 ' and uploaded to ' +
+//                 destination.bucket +
+//                 '/' +
+//                 destination.bucket,
+//         );
+//     } catch (error) {
+//         console.log(error);
+//         return;
+//     }
+// };
+
 export const createThumbnail = async (
     source: { bucket: string; key: string },
     destination: { bucket: string; key: string },
     client: S3Client,
 ) => {
     console.log('inside thumbnail creator');
-    try {
-        const params = {
-            Bucket: source.bucket,
-            Key: source.key,
-        };
-        console.log(`bucket: ${source.bucket} key: ${source.key}`);
-        const response: GetObjectCommandOutput = await client.send(new GetObjectCommand(params));
-        console.log('got image');
-        const streamData = response.Body;
 
-        if (!(streamData instanceof Readable)) {
+    let content_buffer;
+    let output_buffer;
+    try {
+        const objectData = await getObjectFromS3({ bucket: source.bucket, key: source.key }, client);
+        console.log('got image');
+
+        const stream = objectData?.Body;
+        if (stream instanceof Readable) {
+            const data = [];
+            for await (const chunk of stream) {
+                data.push(chunk);
+                console.log('pushing data..')
+            }
+            content_buffer = Buffer.concat(data);
+        } else {
             throw new Error('Unknown object stream type');
         }
+    } catch (error) {
+        console.error(error);
+        return;
+    }
 
-        const convert = spawn('convert', [
-            '-', // input from stdin
-            '-thumbnail',
-            '200x200^', // thumbnail via imagemagick
-            '-', // output to stdout
-        ]);
-        console.log('converted');
+    // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
+    const width = 200;
 
-        const outStreamToBuffer = new Promise<Buffer>((resolve) => {
-            const chunks: Buffer[] = [];
-            convert.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
-            convert.stdout.on('end', () => resolve(Buffer.concat(chunks)));
-        });
-        console.log('stream to buffer done');
+    try {
+        output_buffer = await sharp(content_buffer).resize(width).toBuffer();
+        console.log('sharping..')
+    } catch (error) {
+        console.error(error);
+        return;
+    }
 
-        // Pipe the image file data from the S3 get request into ImageMagick
-        streamData.pipe(convert.stdin);
-        console.log('stream pipe');
-
-        const output_buffer = await outStreamToBuffer;
-        console.log('output');
-
-        const destparams = {
-            Bucket: destination.bucket,
-            Key: destination.key,
-            Body: output_buffer,
-            ContentType: 'image/jpeg',
-        };
-        console.log('dest param');
-
-        await client.send(new PutObjectCommand(destparams));
-        console.log('sent');
-
-        console.info(
-            'Successfully resized ' +
-                source.bucket +
-                '/' +
-                source.key +
-                ' and uploaded to ' +
-                destination.bucket +
-                '/' +
-                destination.bucket,
-        );
+    try {
+        await putObjectToS3({ bucket: destination.bucket, key: destination.key }, output_buffer, client);
     } catch (error) {
         console.log(error);
         return;
     }
+
+    console.info(
+        'Successfully resized ' +
+            source.bucket +
+            '/' +
+            source.key +
+            ' and uploaded to ' +
+            destination.bucket +
+            '/' +
+            destination.key,
+    );
+};
+
+const getObjectFromS3 = async (
+    source: { bucket: string; key: string },
+    client: S3Client,
+): Promise<GetObjectCommandOutput | undefined> => {
+    const params: GetObjectCommandInput = {
+        Bucket: source.bucket,
+        Key: source.key,
+        ResponseContentType: 'image/jpeg',
+    };
+    let data: GetObjectCommandOutput | undefined;
+    try {
+        data = await client.send(new GetObjectCommand(params));
+    } catch (err) {
+        console.log('Error', err);
+    }
+    return data;
+};
+
+const putObjectToS3 = async (destination: { bucket: string; key: string }, streamData: any, client: S3Client) => {
+    const destparams: PutObjectCommandInput = {
+        Bucket: destination.bucket,
+        Key: destination.key,
+        Body: streamData,
+        ContentType: 'image/jpeg',
+    };
+    console.log('dest param');
+    try {
+        await client.send(new PutObjectCommand(destparams));
+    } catch (err) {
+        console.log('Error', err);
+    }
+    console.log('sent');
 };

@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import { createProduct, createThumbnail, deleteProduct, getAllProducts, uploadProductImage } from './controller';
+import { createThumbnail, deleteProduct, getAllProducts, uploadProductImage } from './controller';
 import dynamodb from 'aws-sdk/clients/dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 
@@ -18,7 +18,7 @@ const dynamoDB = process.env?.AWS_SAM_LOCAL
       })
     : new dynamodb.DocumentClient();
 
-const s3 = new S3Client({ region: process.env.Region ?? 'us-east-1' });
+const s3 = new S3Client({});
 
 export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> => {
     let response: Promise<APIGatewayProxyResult>;
@@ -28,14 +28,14 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
     });
 
     if (event.httpMethod === 'POST' && event.path === '/product') {
-        // createThumbnail(
-        //     { bucket: '20230820-product-image-bucket', key: 'original/1692626589564.jpg' },
-        //     { bucket: '20230820-product-optimized-image-bucket', key: 'download-thumbnail.jpg' },
-        //     s3,
-        // );
-        // return notFound;
-        response = createProduct(event, dynamoDB);
-        return response;
+        createThumbnail(
+            { bucket: '20230820-product-image-bucket', key: 'download.jpeg' },
+            { bucket: '20230820-product-optimized-image-bucket', key: 'download-thumbnail.jpeg' },
+            s3,
+        );
+        return notFound;
+        // response = createProduct(event, dynamoDB);
+        // return response;
     } else if (event.httpMethod === 'GET' && event.path === '/products') {
         response = getAllProducts(dynamoDB);
         return response;
@@ -72,7 +72,6 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         }
 
         createThumbnail({ bucket: srcBucket, key: srcKey }, { bucket: dstBucket, key: dstKey }, s3);
-        return notFound;
     }
     return notFound;
 };
