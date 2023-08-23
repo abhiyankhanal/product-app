@@ -1,67 +1,59 @@
-import { useMutation, useQuery, UseMutationResult, UseQueryResult } from 'react-query';
-export interface IProductType{
-    productId: number;
-    productName: string
-    description: string;
-    imageUri: any;
+import Axios from "axios";
+export interface IProductType {
+  productId: string;
+  productName: string;
+  description: string;
+  imageUri: any;
 }
 
-interface ImageUploadData{
-    id: string;
-    image: string;
-  }
 
 let dummyProducts: IProductType[] = [
   {
-    productId: 1,
+    productId: "1",
     productName: "Hello Plerion",
     description: "Dummy Product Rendered from react",
     imageUri: "",
   },
 ];
-  
-  export const useFetchProduct = (): UseQueryResult<IProductType[], Error> => {
-    return useQuery<IProductType[], Error>('products', () =>
-      fetch("https://9a94xfutb7.execute-api.us-east-1.amazonaws.com/Prod/products")
-        .then(res => res.json())
-    );
-  }
-  
-  export const useDeleteHandler = () => {
-    return (productId: number) =>
-      fetch(
-        `https://9a94xfutb7.execute-api.us-east-1.amazonaws.com/Prod/products/${productId}`,
-        { method: "DELETE" }
-      )
-      .then(res => res.json());
-  };
-  
-  export const useCreateProduct = (product: IProductType): UseMutationResult<void, Error, void, unknown> => {
-    return useMutation<void, Error, void, unknown>(() =>
-      fetch("http://127.0.0.1:3000/product", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(product)
-      })
-        .then(res => res.json())
-    );
-  };
-  
-  export const useUploadImage = (id: string, imageBase64: string): UseMutationResult<void, Error, ImageUploadData, unknown> => {
-    const data: ImageUploadData = {
-      id,
-      image: imageBase64,
-    };
-  
-    return useMutation<void, Error, ImageUploadData, unknown>(() =>
-      fetch("https://xb156ryw68.execute-api.us-east-1.amazonaws.com/Stage/product/upload", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-        .then(res => res.json())
-    );
-  };
 
+// const BASE_URI = `http://127.0.0.1:3000`; //local
+const BASE_URI = `https://9a94xfutb7.execute-api.us-east-1.amazonaws.com/Prod`; //prod
+
+export const fetchProduct = async (): Promise<IProductType[]> => {
+  const res = await Axios.get(`${BASE_URI}/products`);
+  return res.data;
+};
+
+export const deleteProduct = async (productId: string): Promise<any> => {
+  const res = await Axios.delete(`${BASE_URI}/product/${productId}`);
+  return res.data;
+};
+
+export const createProduct = async (product: IProductType): Promise<any> => {
+  const requestBody = {
+    productId: product.productId,
+    productName: product.productName,
+    productDescription: product.description,
+    productImageUri: product.imageUri,
+  };
+  const res = await Axios.post(`${BASE_URI}/product`, requestBody);
+  return res.data;
+};
+
+interface IUploadImageInterface{
+  productId: string
+  image: string
+}
+export const uploadImage = async (
+  base64ImageFile: string,
+  id: string
+): Promise<any> => {
+  const requestBody: IUploadImageInterface = {
+    productId: id,
+    image: base64ImageFile,
+  };
+  const res = await Axios.post(`${BASE_URI}/product/upload`, requestBody);
+  return res.data;
+};
 
 export default dummyProducts;
