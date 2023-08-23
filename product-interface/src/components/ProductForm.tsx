@@ -47,13 +47,13 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
         queryClient.invalidateQueries("products");
       },
     });
-  if(createProductMutation.isLoading || uploadImageMutation.isLoading) {return <Loading />}
-  if (createProductMutation.isError || uploadImageMutation.isError) {
+
+  createProductMutation.isLoading && <Loading />
+  createProductMutation.isError &&
     <ErrorModal
-      error={createProductMutation.error ?? uploadImageMutation.error!}
+      error={createProductMutation.error}
       onClose={() => createProductMutation.reset()}
     ></ErrorModal>;
-  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,7 +61,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
       image: uploadData.image,
       productId: uploadData.productId,
     });
-
+    cancelForm();
     createProductMutation.mutate(product);
   };
 

@@ -16,6 +16,8 @@ import dummyProducts, {
 import ProductForm from "./ProductForm";
 import { ErrorModal, Loading } from "./UtilsUI";
 
+const PLACEHOLDER_IMG_URL = `https://via.placeholder.com/150`
+
 const ProductList = (): JSX.Element => {
   ReactModal.setAppElement("#root");
   const {
@@ -70,8 +72,8 @@ const ProductList = (): JSX.Element => {
               <img
                 className="w-16 h-16 flex-1 mx-2"
                 src={
-                  product.ProductImageUri ??
-                  process.env.REACT_APP_PLACEHOLDER_IMAGE
+                  product.ProductImageUri === '' ?
+                  PLACEHOLDER_IMG_URL: product.ProductImageUri??''
                 }
                 alt={product.ProductName}
               />

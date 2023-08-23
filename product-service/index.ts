@@ -26,22 +26,30 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         statusCode: 400,
         body: JSON.stringify({ message: 'Path not found' }),
     });
-
+    //create product with empty image
     if (event.httpMethod === 'POST' && event.path === '/product') {
         response = createProduct(event, dynamoDB);
         return response;
+    
+     //Get product list
     } else if (event.httpMethod === 'GET' && event.path === '/products') {
         response = getAllProducts(dynamoDB);
         return response;
+    
+    //Delete product 
     } else if (event.httpMethod === 'DELETE' && event.path.startsWith('/product/')) {
         const productId = event.pathParameters?.productId;
         if (productId) {
             response = deleteProduct(event, dynamoDB);
             return response;
         }
+    
+    //Upload original image
     } else if (event.httpMethod === 'POST' && event.path === '/product/upload') {
         response = uploadProductImage(event, s3, dynamoDB);
         return response;
+    
+    //Get event from event rule and create thumbnail
     } else if (event.source === 'aws.s3') {
         console.info(`Reading options from event:\n ${JSON.stringify(event)}`);
         const srcBucket = event.detail.bucket.name;

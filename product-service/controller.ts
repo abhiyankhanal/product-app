@@ -30,16 +30,18 @@ export const createProduct = async (
             })
             .promise();
 
-        return {
+        const response =  {
             statusCode: 200,
             body: JSON.stringify({ message: 'Product created successfully' }),
         };
+        return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error creating product:', error);
-        return {
+        const response =  {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error creating product' }),
         };
+        return createResponseWithCorsHeaders(response);
     }
 };
 
@@ -52,16 +54,18 @@ export const getAllProducts = async (dynamoDB: AWS.DynamoDB.DocumentClient): Pro
             })
             .promise();
 
-        return {
+        const response = {
             statusCode: 200,
             body: JSON.stringify(result.Items),
         };
+        return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error retrieving products:', error);
-        return {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error retrieving products' }),
         };
+        return createResponseWithCorsHeaders(response);
     }
 };
 
@@ -80,16 +84,18 @@ export const deleteProduct = async (
             })
             .promise();
 
-        return {
+        const response =  {
             statusCode: 200,
             body: JSON.stringify({ message: 'Product deleted successfully' }),
         };
+        return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error deleting product:', error);
-        return {
+        const response =  {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error deleting product' }),
         };
+        return createResponseWithCorsHeaders(response);
     }
 };
 
@@ -141,33 +147,36 @@ export const uploadProductImage = async (
             const data = await dynamoDB.update(params).promise();
             console.log(`updated data to dynamo db`);
             
-            return {
+            const response =  {
                 statusCode: 200,
                 body: JSON.stringify({
                     message: 'Product image uploaded successfully',
                     imageUrl: productImageUri,
                 }),
             };
+            return createResponseWithCorsHeaders(response);
         } catch (err) {
             console.error(err);
 
-            return {
+            const response = {
                 statusCode: 500,
                 body: JSON.stringify({
                     message: 'Error updating DynamoDB',
                     error: err,
                 }),
             };
+            return createResponseWithCorsHeaders(response);
         }
     } catch (error) {
         console.error('Error while uploading original image:', error);
-        return {
+        const response =  {
             statusCode: 500,
             body: JSON.stringify({
                 message: 'Error:',
                 error: error,
             }),
         };
+        return createResponseWithCorsHeaders(response);
     }
 };
 
@@ -261,4 +270,16 @@ const putObjectToS3 = async (destination: { bucket: string; key: string }, strea
         console.log('Error', err);
     }
     console.log('sent');
+};
+
+const createResponseWithCorsHeaders = (response: APIGatewayProxyResult): Promise<APIGatewayProxyResult> => {
+    return Promise.resolve({
+        ...response,
+        headers: {
+            ...response.headers,
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        },
+    });
 };
