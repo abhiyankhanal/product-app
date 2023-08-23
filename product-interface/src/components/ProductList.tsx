@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
+
 import ReactModal from "react-modal";
+import { AiFillPlusCircle } from "react-icons/ai";
 import {
   UseMutationResult,
   UseQueryResult,
@@ -8,6 +9,7 @@ import {
   useQuery,
   useQueryClient,
 } from "react-query";
+
 import dummyProducts, {
   fetchProduct,
   IProductType,
@@ -95,17 +97,17 @@ const ProductList = (): JSX.Element => {
         <AiFillPlusCircle className="text-2xl text-white" />
       </button>
       <div className="container">
-      <div className="text-center mx-2 mt-5">
-      <div className="flex items-center justify-center mb-5">
-        <h2 className="text-3xl font-bold text-gray-700">Products</h2>
-        <button
-          className="px-4 mx-2 py-2 bg-gray-700 text-white rounded hover:bg-blue-600"
-          onClick={handleRefresh}
-        >
-          Refresh
-        </button>
-      </div>
-      </div>
+        <div className="text-center mx-2 mt-5">
+          <div className="flex items-center justify-center mb-5">
+            <h2 className="text-3xl font-bold text-gray-700">Products</h2>
+            <button
+              className="px-4 mx-2 py-2 bg-gray-700 text-white rounded hover:bg-blue-600"
+              onClick={handleRefresh}
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

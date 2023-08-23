@@ -17,7 +17,7 @@ let dummyProducts: IProductType[] = [
 ];
 
 // const BASE_URI = `http://127.0.0.1:3000`; //local
-const BASE_URI = `https://9a94xfutb7.execute-api.us-east-1.amazonaws.com/Prod`; //prod
+const BASE_URI = `https://hqdwu5j7af.execute-api.us-east-1.amazonaws.com`; //prod
 
 export const fetchProduct = async (): Promise<IProductType[]> => {
   const res = await Axios.get(`${BASE_URI}/products`);

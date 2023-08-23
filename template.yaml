@@ -8,12 +8,6 @@ Globals:
     Timeout: 3
     MemorySize: 128
 
-  Api:
-    Cors:
-      AllowOrigin: "'*'"
-      AllowMethods: "'OPTIONS,GET,PUT,POST,DELETE'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-
 Resources:
   ProductDynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -63,24 +57,28 @@ Resources:
         - x86_64
       Events:
         CreateProductEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: MyHttpApi
             Path: /product
             Method: POST
 
         GetProductsEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: MyHttpApi
             Path: /products
             Method: GET
         DeleteProductEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: MyHttpApi
             Path: /product/{productId}
             Method: DELETE
         UploadProductEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: MyHttpApi
             Path: /product/upload
             Method: POST
 
@@ -94,6 +92,20 @@ Resources:
           - index.ts
         External:
           - "sharp"
+
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: ProductHttpApi
+      Auth:
+        DefaultAuthorizer: MyOauth2Authorizer
+        Authorizers:
+          MyOauth2Authorizer: 
+            JwtConfiguration:
+              issuer: "https://auth0-jwt-authorizer"
+              audience: 
+                - "https://dev-a5c5obtulhm3rgwq.us.auth0.com/"
+            IdentitySource: "$request.header.Authorization"
 
   ProductImageBucket:
     Type: AWS::S3::Bucket
@@ -126,22 +138,22 @@ Resources:
         BlockPublicPolicy: false
         IgnorePublicAcls: true
         RestrictPublicBuckets: false
-  
+
   ProductOptimizedImageBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref ProductOptimizedImageBucket
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Action: s3:GetObject
             Resource: !Join
-              - ''
-              - - 'arn:aws:s3:::'
+              - ""
+              - - "arn:aws:s3:::"
                 - !Ref ProductOptimizedImageBucket
-                - '/*'
-            Principal: '*'
+                - "/*"
+            Principal: "*"
 
   S3UploadEventRule:
     Type: AWS::Events::Rule
@@ -156,7 +168,7 @@ Resources:
         detail:
           bucket:
             name:
-              - !Ref ProductImageBucket 
+              - !Ref ProductImageBucket
       Targets:
         - Arn: !GetAtt ProductAppFunction.Arn
           Id: S3UploadLambdaTarget
@@ -182,36 +194,20 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: "true"
-  
+
 Outputs:
-  CreateProductApi:
-    Description: "Create API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product"
-
-  GetProductsApi:
-    Description: "Get API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/products"
-
-  DeleteProductApi:
-    Description: "Delete API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/{productId}"
-
-  UploadProductApi:
-    Description: "Upload API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/upload"
-
   ProductAppFunction:
     Description: Product App Function ARN
     Value: !GetAtt ProductAppFunction.Arn
 
   ProductDynamoDBTable:
-    Description: DynamoDB Table for storing products
+    Description: DynamoDB Table for storing products.
     Value: !Ref ProductDynamoDBTable
 
   ProductImageBucketName:
-    Description: Name of the product image bucket
+    Description: Name of the product image bucket.
     Value: !Ref ProductImageBucket
 
   S3UploadEventRuleArn:
-    Description: ARN of the S3 upload EventBridge rule
+    Description: ARN of the S3 upload EventBridge rule.
     Value: !Ref S3UploadEventRule

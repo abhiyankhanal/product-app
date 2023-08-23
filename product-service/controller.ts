@@ -30,14 +30,14 @@ export const createProduct = async (
             })
             .promise();
 
-        const response =  {
+        const response = {
             statusCode: 200,
             body: JSON.stringify({ message: 'Product created successfully' }),
         };
         return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error creating product:', error);
-        const response =  {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error creating product' }),
         };
@@ -84,14 +84,14 @@ export const deleteProduct = async (
             })
             .promise();
 
-        const response =  {
+        const response = {
             statusCode: 200,
             body: JSON.stringify({ message: 'Product deleted successfully' }),
         };
         return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error deleting product:', error);
-        const response =  {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error deleting product' }),
         };
@@ -123,12 +123,14 @@ export const uploadProductImage = async (
         };
 
         // Form the URL of the uploaded image
-        const productImageUri = `https://${process.env.DESTINATION_BUCKET??'20230820-product-optimized-image-bucket'}.s3.amazonaws.com/resized-${uploadParams.Key}`;
+        const productImageUri = `https://${
+            process.env.DESTINATION_BUCKET ?? '20230820-product-optimized-image-bucket'
+        }.s3.amazonaws.com/resized-${uploadParams.Key}`;
 
         const command = new PutObjectCommand(uploadParams);
 
         await s3.send(command);
-        console.info(`succesfully uploaded original image to s3`)
+        console.info(`succesfully uploaded original image to s3`);
 
         const params = {
             TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
@@ -144,10 +146,10 @@ export const uploadProductImage = async (
         };
 
         try {
-            const data = await dynamoDB.update(params).promise();
+            await dynamoDB.update(params).promise();
             console.log(`updated data to dynamo db`);
-            
-            const response =  {
+
+            const response = {
                 statusCode: 200,
                 body: JSON.stringify({
                     message: 'Product image uploaded successfully',
@@ -169,7 +171,7 @@ export const uploadProductImage = async (
         }
     } catch (error) {
         console.error('Error while uploading original image:', error);
-        const response =  {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({
                 message: 'Error:',
@@ -207,12 +209,13 @@ export const createThumbnail = async (
         return;
     }
 
-    // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
+    //thumbnail width and height
     const width = 200;
+    const height = 200;
 
     try {
-        output_buffer = await sharp(content_buffer).resize(width).toBuffer();
-        console.info('resizing....')
+        output_buffer = await sharp(content_buffer).resize(width, height).toBuffer();
+        console.info('resizing....');
     } catch (error) {
         console.error(error);
         return;
@@ -278,7 +281,7 @@ const createResponseWithCorsHeaders = (response: APIGatewayProxyResult): Promise
         headers: {
             ...response.headers,
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         },
     });

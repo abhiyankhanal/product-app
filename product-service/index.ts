@@ -27,36 +27,36 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         body: JSON.stringify({ message: 'Path not found' }),
     });
     //create product with empty image
-    if (event.httpMethod === 'POST' && event.path === '/product') {
+    if (event.routeKey === 'POST /product') {
         response = createProduct(event, dynamoDB);
         return response;
-    
-     //Get product list
-    } else if (event.httpMethod === 'GET' && event.path === '/products') {
+
+        //Get product list
+    } else if (event.routeKey === 'GET /products') {
         response = getAllProducts(dynamoDB);
         return response;
-    
-    //Delete product 
-    } else if (event.httpMethod === 'DELETE' && event.path.startsWith('/product/')) {
+
+        //Delete product
+    } else if (event.routeKey === 'DELETE /product/{id}') {
         const productId = event.pathParameters?.productId;
         if (productId) {
             response = deleteProduct(event, dynamoDB);
             return response;
         }
-    
-    //Upload original image
-    } else if (event.httpMethod === 'POST' && event.path === '/product/upload') {
+
+        //Upload original image
+    } else if (event.routeKey === 'POST /product/upload') {
         response = uploadProductImage(event, s3, dynamoDB);
         return response;
-    
-    //Get event from event rule and create thumbnail
+
+        //Get event from event rule and create thumbnail
     } else if (event.source === 'aws.s3') {
         console.info(`Reading options from event:\n ${JSON.stringify(event)}`);
         const srcBucket = event.detail.bucket.name;
 
         // Object key may have spaces or unicode non-ASCII characters
         const srcKey = decodeURIComponent(event.detail.object.key.replace(/\+/g, ' '));
-        const dstBucket = process.env.DESTINATION_BUCKET??'20230820-product-optimized-image-bucket';
+        const dstBucket = process.env.DESTINATION_BUCKET ?? '20230820-product-optimized-image-bucket';
         const dstKey = 'resized-' + srcKey;
 
         // Infer the image type from the file suffix
