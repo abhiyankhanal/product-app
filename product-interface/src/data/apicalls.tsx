@@ -1,18 +1,18 @@
 import Axios from "axios";
 export interface IProductType {
-  productId: string;
-  productName: string;
-  description: string;
-  imageUri: any;
+  ProductId: string;
+  ProductName: string;
+  ProductDescription: string;
+  ProductImageUri: string|null;
 }
 
 
 let dummyProducts: IProductType[] = [
   {
-    productId: "1",
-    productName: "Hello Plerion",
-    description: "Dummy Product Rendered from react",
-    imageUri: "",
+    ProductId: "1",
+    ProductName: "Hello Plerion",
+    ProductDescription: "Dummy Product Rendered from react",
+    ProductImageUri: "",
   },
 ];
 
@@ -31,27 +31,27 @@ export const deleteProduct = async (productId: string): Promise<any> => {
 
 export const createProduct = async (product: IProductType): Promise<any> => {
   const requestBody = {
-    productId: product.productId,
-    productName: product.productName,
-    productDescription: product.description,
-    productImageUri: product.imageUri,
+    productId: product.ProductId,
+    productName: product.ProductName,
+    productDescription: product.ProductDescription,
+    productImageUri: product.ProductImageUri,
   };
   const res = await Axios.post(`${BASE_URI}/product`, requestBody);
   return res.data;
 };
 
-interface IUploadImageInterface{
+export interface IUploadImageInterface{
   productId: string
   image: string
 }
 export const uploadImage = async (
-  base64ImageFile: string,
-  id: string
+ imageData: IUploadImageInterface
 ): Promise<any> => {
   const requestBody: IUploadImageInterface = {
-    productId: id,
-    image: base64ImageFile,
+    productId: imageData.productId,
+    image: imageData.image,
   };
+  console.log(requestBody)
   const res = await Axios.post(`${BASE_URI}/product/upload`, requestBody);
   return res.data;
 };

@@ -1,6 +1,12 @@
 import React, { useState } from "react";
-import { IProductType, createProduct, uploadImage } from "../data/apicalls";
+import {
+  IProductType,
+  IUploadImageInterface,
+  createProduct,
+  uploadImage,
+} from "../data/apicalls";
 import { UseMutationResult, useMutation, useQueryClient } from "react-query";
+import { ErrorModal, Loading } from "./UtilsUI";
 
 interface IProductFormProps {
   cancelForm: () => void;
@@ -9,23 +15,30 @@ interface IProductFormProps {
 const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
   const queryClient = useQueryClient();
   const [product, setProduct] = useState<IProductType>({
-    productId: "",
-    productName: "",
-    description: "",
-    imageUri: "",
+    ProductId: "",
+    ProductName: "",
+    ProductDescription: "",
+    ProductImageUri: "",
   });
-  // const mutationUpload = useUploadImage(product.productId.toString(), product.imageUri);
-  // const mutationCreate = useCreateProduct(product);
-  const uploadImageMutation: UseMutationResult<void, Error, string, string> =
-    useMutation({
-      mutationFn: uploadImage,
-      onSuccess: () => {
-        setTimeout(() => {
-          // Invalidate the "products" query after waiting for 10 seconds
-          queryClient.invalidateQueries("products");
-        }, 10000);
-      },
-    });
+
+  const [uploadData, setUploadData] = useState<IUploadImageInterface>({
+    productId: "",
+    image: "",
+  });
+
+  const uploadImageMutation: UseMutationResult<
+    void,
+    Error,
+    IUploadImageInterface
+  > = useMutation({
+    mutationFn: uploadImage,
+    onSuccess: () => {
+      setTimeout(() => {
+        // Invalidate the "products" query after waiting for 10 seconds
+        queryClient.invalidateQueries("products");
+      }, 10000);
+    },
+  });
 
   const createProductMutation: UseMutationResult<void, Error, IProductType> =
     useMutation({
@@ -34,15 +47,40 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
         queryClient.invalidateQueries("products");
       },
     });
+  if(createProductMutation.isLoading || uploadImageMutation.isLoading) {return <Loading />}
+  if (createProductMutation.isError || uploadImageMutation.isError) {
+    <ErrorModal
+      error={createProductMutation.error ?? uploadImageMutation.error!}
+      onClose={() => createProductMutation.reset()}
+    ></ErrorModal>;
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    uploadImageMutation.mutate(
-      product.productId,
-      product.imageUri
-    );
+    uploadImageMutation.mutate({
+      image: uploadData.image,
+      productId: uploadData.productId,
+    });
 
     createProductMutation.mutate(product);
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Convert the selected image to a base64 string
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target) {
+          const base64Image = e.target.result;
+          setUploadData((uploadData) => ({
+            ...uploadData,
+            uploadData: base64Image?.toString(),
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -59,7 +97,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
             name="productId"
             required
             onChange={(event) =>
-              setProduct({ ...product, productId: event.target.value })
+              setProduct({ ...product, ProductId: event.target.value })
             }
           />
         </div>
@@ -75,7 +113,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
             name="productName"
             required
             onChange={(event) =>
-              setProduct({ ...product, productName: event.target.value })
+              setProduct({ ...product, ProductName: event.target.value })
             }
           />
         </div>
@@ -91,7 +129,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
             rows={3}
             required
             onChange={(event) =>
-              setProduct({ ...product, description: event.target.value })
+              setProduct({ ...product, ProductDescription: event.target.value })
             }
           />
         </div>
@@ -107,6 +145,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
             name="productImage"
             accept=".jpg, .jpeg"
             required
+            onChange={handleImageChange}
           />
         </div>
 

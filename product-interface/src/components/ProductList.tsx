@@ -14,6 +14,7 @@ import dummyProducts, {
   deleteProduct,
 } from "../data/apicalls";
 import ProductForm from "./ProductForm";
+import { ErrorModal, Loading } from "./UtilsUI";
 
 const ProductList = (): JSX.Element => {
   ReactModal.setAppElement("#root");
@@ -30,23 +31,22 @@ const ProductList = (): JSX.Element => {
   const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
 
-  // const mutation = useMutation((id: string) => deleteProduct(id), {
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries("products");
-  //   },
-  // });
-
-  // const deleteHandler = (id: string) => {
-  //   mutation.mutate(id);
-  // };
-
   const deleteProductMutation: UseMutationResult<void, Error, string> =
     useMutation({
       mutationFn: (productId: string) => deleteProduct(productId),
       onSuccess: () => {
-            queryClient.invalidateQueries("products");
-          },
+        queryClient.invalidateQueries("products");
+      },
     });
+
+  deleteProductMutation.isLoading && <Loading />;
+
+  deleteProductMutation.isError && (
+    <ErrorModal
+      error={deleteProductMutation.error}
+      onClose={() => deleteProductMutation.reset()}
+    ></ErrorModal>
+  );
 
   let productsForUI: IProductType[];
   productsForUI = dummyProducts;
@@ -64,20 +64,21 @@ const ProductList = (): JSX.Element => {
         {productsForUI &&
           productsForUI.map((product) => (
             <div
-              key={product.productId}
+              key={product.ProductId}
               className="bg-white shadow overflow-hidden sm:rounded-md mb-4 flex items-center justify-between px-4 py-2 mx-2"
             >
               <img
                 className="w-16 h-16 flex-1 mx-2"
                 src={
-                  product.imageUri ?? process.env.REACT_APP_PLACEHOLDER_IMAGE
+                  product.ProductImageUri ??
+                  process.env.REACT_APP_PLACEHOLDER_IMAGE
                 }
-                alt={product.productName}
+                alt={product.ProductName}
               />
-              <p className="text-l flex-1 mx-2">{product.productName}</p>
-              <p className="text-l flex-1 mx-2">{product.description}</p>
+              <p className="text-l flex-1 mx-2">{product.ProductName}</p>
+              <p className="text-l flex-1 mx-2">{product.ProductDescription}</p>
               <button
-                onClick={() => deleteProductMutation.mutate(product.productId)}
+                onClick={() => deleteProductMutation.mutate(product.ProductId)}
                 className="ml-2 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-700 flex items-center justify-center flex-1"
               >
                 <AiFillDelete className="mr-1" />

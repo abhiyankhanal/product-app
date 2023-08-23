@@ -41,8 +41,9 @@ Resources:
         - nodejs18.x
 
   ProductAppFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
+      # ReservedConcurrentExecutions: 10 //Failed to update
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ProductDynamoDBTable
@@ -122,9 +123,25 @@ Resources:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: true
         RestrictPublicBuckets: false
+  
+  ProductOptimizedImageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ProductOptimizedImageBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: s3:GetObject
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref ProductOptimizedImageBucket
+                - '/*'
+            Principal: '*'
 
   S3UploadEventRule:
     Type: AWS::Events::Rule
