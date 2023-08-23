@@ -35,7 +35,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     onSuccess: () => {
       setTimeout(() => {
         // Invalidate the "products" query after waiting for 10 seconds
-        queryClient.invalidateQueries("products");
+        queryClient.invalidateQueries(["products"]);
       }, 10000);
     },
   });
@@ -44,7 +44,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     useMutation({
       mutationFn: createProduct,
       onSuccess: () => {
-        queryClient.invalidateQueries("products");
+        queryClient.invalidateQueries(["products"]);
       },
     });
 
@@ -59,23 +59,22 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     event.preventDefault();
     uploadImageMutation.mutate({
       image: uploadData.image,
-      productId: uploadData.productId,
+      productId: product.ProductId,
     });
-    cancelForm();
     createProductMutation.mutate(product);
+    cancelForm();
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Convert the selected image to a base64 string
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target) {
           const base64Image = e.target.result;
           setUploadData((uploadData) => ({
             ...uploadData,
-            uploadData: base64Image?.toString(),
+            image: String(base64Image)
           }));
         }
       };
@@ -149,7 +148,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
           />
         </div>
 
-        <button className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-700 mr-2">
+        <button className="py-2 px-4 bg-gray-600 text-white rounded hover:bg-gray-700 mr-2" disabled={uploadImageMutation.isLoading}>
           Submit
         </button>
         <button

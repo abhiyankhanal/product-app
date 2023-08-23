@@ -16,7 +16,7 @@ import dummyProducts, {
 import ProductForm from "./ProductForm";
 import { ErrorModal, Loading } from "./UtilsUI";
 
-const PLACEHOLDER_IMG_URL = `https://via.placeholder.com/150`
+const PLACEHOLDER_IMG_URL = `https://via.placeholder.com/150`;
 
 const ProductList = (): JSX.Element => {
   ReactModal.setAppElement("#root");
@@ -26,7 +26,7 @@ const ProductList = (): JSX.Element => {
     isError,
     isLoading,
   }: UseQueryResult<IProductType[], Error> = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["products"],
     queryFn: () => fetchProduct(),
   });
 
@@ -37,18 +37,22 @@ const ProductList = (): JSX.Element => {
     useMutation({
       mutationFn: (productId: string) => deleteProduct(productId),
       onSuccess: () => {
-        queryClient.invalidateQueries("products");
+        queryClient.invalidateQueries(["products"]);
       },
     });
 
-  deleteProductMutation.isLoading && <Loading />;
+  if (deleteProductMutation.isLoading) {
+    return <Loading />;
+  }
 
-  deleteProductMutation.isError && (
-    <ErrorModal
-      error={deleteProductMutation.error}
-      onClose={() => deleteProductMutation.reset()}
-    ></ErrorModal>
-  );
+  if (deleteProductMutation.isError) {
+    return (
+      <ErrorModal
+        error={deleteProductMutation.error}
+        onClose={() => deleteProductMutation.reset()}
+      ></ErrorModal>
+    );
+  }
 
   let productsForUI: IProductType[];
   productsForUI = dummyProducts;
@@ -58,63 +62,103 @@ const ProductList = (): JSX.Element => {
     productsForUI = products;
   }
   if (isError) return <span>Error: {error.message}</span>;
+  const handleRefresh = () => {
+    queryClient.invalidateQueries(["products"]);
+  };
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center mt-4">
-        <h2 className="text-3xl font-bold mb-4 text-center mx-2">Products</h2>
-        {productsForUI &&
-          productsForUI.map((product) => (
-            <div
-              key={product.ProductId}
-              className="bg-white shadow overflow-hidden sm:rounded-md mb-4 flex items-center justify-between px-4 py-2 mx-2"
-            >
-              <img
-                className="w-16 h-16 flex-1 mx-2"
-                src={
-                  product.ProductImageUri === '' ?
-                  PLACEHOLDER_IMG_URL: product.ProductImageUri??''
-                }
-                alt={product.ProductName}
-              />
-              <p className="text-l flex-1 mx-2">{product.ProductName}</p>
-              <p className="text-l flex-1 mx-2">{product.ProductDescription}</p>
-              <button
-                onClick={() => deleteProductMutation.mutate(product.ProductId)}
-                className="ml-2 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-700 flex items-center justify-center flex-1"
-              >
-                <AiFillDelete className="mr-1" />
-                Delete
-              </button>
-            </div>
-          ))}
+      <ReactModal
+        isOpen={showForm}
+        onRequestClose={() => setShowForm(false)}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          },
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+          },
+        }}
+      >
+        <ProductForm cancelForm={() => setShowForm(false)} />
+      </ReactModal>
 
-        <ReactModal
-          isOpen={showForm}
-          onRequestClose={() => setShowForm(false)}
-          style={{
-            overlay: {
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            },
-            content: {
-              top: "50%",
-              left: "50%",
-              right: "auto",
-              bottom: "auto",
-              marginRight: "-50%",
-              transform: "translate(-50%, -50%)",
-            },
-          }}
-        >
-          <ProductForm cancelForm={() => setShowForm(false)} />
-        </ReactModal>
-
+      <button
+        onClick={() => setShowForm(!showForm)}
+        className="bg-gray-700 fixed right-4 bottom-4 p-6 rounded-full hover:bg-gray-800"
+      >
+        <AiFillPlusCircle className="text-2xl text-white" />
+      </button>
+      <div className="container">
+      <div className="text-center mx-2 mt-5">
+      <div className="flex items-center justify-center mb-5">
+        <h2 className="text-3xl font-bold text-gray-700">Products</h2>
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-500 fixed right-4 bottom-4 p-6 rounded-full hover:bg-blue-700"
+          className="px-4 mx-2 py-2 bg-gray-700 text-white rounded hover:bg-blue-600"
+          onClick={handleRefresh}
         >
-          <AiFillPlusCircle className="text-2xl text-white" />
+          Refresh
         </button>
+      </div>
+      </div>
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  <span className="sr-only">Image</span>
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Description
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Product
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {productsForUI &&
+                productsForUI.map((product) => (
+                  <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td className="w-32 p-4">
+                      <img
+                        src={
+                          product.ProductImageUri === ""
+                            ? PLACEHOLDER_IMG_URL
+                            : product.ProductImageUri ?? ""
+                        }
+                        alt={product.ProductName}
+                      />
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                      {product.ProductDescription}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                      {product.ProductName}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div
+                        className="font-medium text-red-600 dark:text-red-500 hover:underline cursor-pointer"
+                        onClick={() =>
+                          deleteProductMutation.mutate(product.ProductId)
+                        }
+                      >
+                        Remove
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
