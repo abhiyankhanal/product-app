@@ -9,7 +9,7 @@ export const APIKeyInput = () => {
 
     const authenticationMutation: UseMutationResult<IProductType[], Error, string, unknown> =
     useMutation({
-      mutationFn: () => fetchProduct(apiKey),
+      mutationFn: () => fetchProduct(),
       onSuccess: () => {
         toggleProductListPage(true);
       },

@@ -17,12 +17,13 @@ let dummyProducts: IProductType[] = [
 
 // const BASE_URI = `http://127.0.0.1:3000`; //local
 const BASE_URI = `https://hijplpidac.execute-api.us-east-1.amazonaws.com/Prod`; //prod
+const API_KEY = localStorage.getItem("X-Api-Key");
 
-export const fetchProduct = async (apiKey: string): Promise<IProductType[]> => {
-  const res = await Axios.get(`${BASE_URI}/products`, {
+export const fetchProduct = async (): Promise<IProductType[]> => {
+  const res = await Axios.get(`${BASE_URI}/products`, 
+  {
     headers: { 
-      "X-Api-Key": apiKey,
-      "Accept": "X-Api-Key, Content-Type", 
+      "X-Api-Key": API_KEY,
       "Content-Type": "application/json"
     },
   });
@@ -30,22 +31,18 @@ export const fetchProduct = async (apiKey: string): Promise<IProductType[]> => {
 };
 
 export const deleteProduct = async (
-  productId: string,
-  apiKey: string
+  productId: string
 ): Promise<any> => {
   const res = await Axios.delete(`${BASE_URI}/product/${productId}`, {
     headers: { 
-      "X-Api-Key": apiKey,
-      "Accept": "Content-Type", 
+      "X-Api-Key": API_KEY,
       "Content-Type": "application/json"
     },
   });
   return res.data;
 };
 
-export interface ICreateProductType extends IProductType {
-  apiKey: string|null;
-}
+export interface ICreateProductType extends IProductType {}
 export const createProduct = async (
   createProductParams: ICreateProductType
 ): Promise<any> => {
@@ -57,8 +54,7 @@ export const createProduct = async (
   };
   const res = await Axios.post(`${BASE_URI}/product`, requestBody, {
     headers: { 
-      "X-Api-Key": createProductParams.apiKey, 
-      "Accept": "Content-Type", 
+      "X-Api-Key": API_KEY, 
       "Content-Type": "application/json"
     },
   });
@@ -68,7 +64,6 @@ export const createProduct = async (
 export interface IUploadImageInterface {
   productId: string;
   image: string;
-  apiKey?: string;
 }
 export const uploadImage = async (
   imageData: IUploadImageInterface
@@ -80,9 +75,8 @@ export const uploadImage = async (
 
   const res = await Axios.post(`${BASE_URI}/product/upload`, uploadParams, {
     headers: { 
-      "X-Api-Key": imageData.apiKey, 
-        "Accept": "Content-Type", 
-        "Content-Type": "application/json"
+      "X-Api-Key":  API_KEY,
+      "Content-Type": "application/json"
     },
   });
   return res.data;

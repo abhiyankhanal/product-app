@@ -31,8 +31,9 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
     let response: Promise<APIGatewayProxyResult>;
     const notFound = {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Path not found' }),
+        body: JSON.stringify({ message: 'The requested path is not available or not found' }),
     };
+
     const notFoundeResponse = createResponseWithCorsHeaders(notFound);
 
     //create product with empty image

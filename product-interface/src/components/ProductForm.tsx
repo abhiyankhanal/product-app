@@ -14,8 +14,6 @@ interface IProductFormProps {
 }
 
 const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
-  const apiKey = localStorage.getItem('X-Api-Key');
-  console.log(`API key here`, apiKey)
   const queryClient = useQueryClient();
   const [product, setProduct] = useState<IProductType>({
     ProductId: "",
@@ -27,7 +25,6 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
   const [uploadData, setUploadData] = useState<IUploadImageInterface>({
     productId: "",
     image: "",
-    apiKey: apiKey!
   });
 
   const uploadImageMutation: UseMutationResult<
@@ -43,7 +40,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     },
   });
 
-  const createProductMutation: UseMutationResult<void, Error, ICreateProductType, string> =
+  const createProductMutation: UseMutationResult<void, Error, ICreateProductType> =
     useMutation({
       mutationFn: createProduct,
       onSuccess: () => {
@@ -63,9 +60,8 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     uploadImageMutation.mutate({
       image: uploadData.image,
       productId: product.ProductId,
-      apiKey: apiKey!
     });
-    createProductMutation.mutate({...product, apiKey});
+    createProductMutation.mutate(product);
     cancelForm();
   };
 

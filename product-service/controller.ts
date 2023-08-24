@@ -146,7 +146,7 @@ export const uploadProductImage = async (
         };
 
         try {
-            const data = await dynamoDB.update(params).promise();
+            await dynamoDB.update(params).promise();
             console.log(`updated data to dynamo db`);
 
             const response = {
@@ -209,11 +209,12 @@ export const createThumbnail = async (
         return;
     }
 
-    // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
+    //thumbnail width and height
     const width = 200;
+    const height = 200;
 
     try {
-        output_buffer = await sharp(content_buffer).resize(width).toBuffer();
+        output_buffer = await sharp(content_buffer).resize(width, height).toBuffer();
         console.info('resizing....');
     } catch (error) {
         console.error(error);
@@ -280,7 +281,7 @@ export const createResponseWithCorsHeaders = (response: APIGatewayProxyResult): 
         headers: {
             ...response.headers,
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         },
     });

@@ -3,14 +3,9 @@
   "version": "1.0.0",
   "description": "layer for dependencies",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "abhiyan",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.395.0",
-    "aws-sdk": "^2.1440.0",
-    "esbuild": "^0.14.14"
+    "sharp": "^0.32.1"
   }
 }

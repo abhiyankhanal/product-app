@@ -20,10 +20,9 @@ const PLACEHOLDER_IMG_URL = `https://via.placeholder.com/150`;
 
 const ProductList = (): JSX.Element => {
   ReactModal.setAppElement("#root");
-  const apiKey = localStorage.getItem('X-Api-Key');
   const productListQuery: UseQueryResult<IProductType[], Error> = useQuery({
     queryKey: ["products"],
-    queryFn: () => fetchProduct(apiKey!),
+    queryFn: () => fetchProduct(),
   });
 
   const [showForm, setShowForm] = useState(false);
@@ -31,7 +30,7 @@ const ProductList = (): JSX.Element => {
 
   const deleteProductMutation: UseMutationResult<void, Error, string> =
     useMutation({
-      mutationFn: (productId: string) => deleteProduct(productId, apiKey!),
+      mutationFn: (productId: string) => deleteProduct(productId),
       onSuccess: () => {
         queryClient.invalidateQueries(["products"]);
       },
