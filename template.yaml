@@ -40,6 +40,49 @@ Resources:
       CompatibleRuntimes:
         - nodejs18.x
 
+  ServerlessHttpApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: [ApiUsagePlan]
+    Properties:
+      Name: !Join ["", [{ "Ref": "AWS::StackName" }, "-apikey"]]
+      Description: "Product App API Key"
+      Enabled: true
+      GenerateDistinctId: false
+      Value: abcdefg123456665ffghsdghfgdhfgdh4565
+      StageKeys:
+        - RestApiId: !Ref ServerlessHttpApi
+          StageName: Prod
+
+  ApiUsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    DependsOn:
+      - ServerlessHttpApiProdStage
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ServerlessHttpApi
+          Stage: Prod
+      Description: !Join [" ", [{ "Ref": "AWS::StackName" }, "usage plan"]]
+      Quota:
+        Limit: 1000
+        Period: MONTH
+      UsagePlanName: !Join ["", [{ "Ref": "AWS::StackName" }, "-usage-plan"]]
+
+  ApiUsagePlanKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    DependsOn:
+      - ServerlessHttpApi
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
+
   ProductAppFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -65,22 +108,26 @@ Resources:
         CreateProductEvent:
           Type: Api
           Properties:
+            RestApiId: !Ref ServerlessHttpApi
             Path: /product
             Method: POST
 
         GetProductsEvent:
           Type: Api
           Properties:
+            RestApiId: !Ref ServerlessHttpApi
             Path: /products
             Method: GET
         DeleteProductEvent:
           Type: Api
           Properties:
+            RestApiId: !Ref ServerlessHttpApi
             Path: /product/{productId}
             Method: DELETE
         UploadProductEvent:
           Type: Api
           Properties:
+            RestApiId: !Ref ServerlessHttpApi
             Path: /product/upload
             Method: POST
 
@@ -126,22 +173,22 @@ Resources:
         BlockPublicPolicy: false
         IgnorePublicAcls: true
         RestrictPublicBuckets: false
-  
+
   ProductOptimizedImageBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref ProductOptimizedImageBucket
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Action: s3:GetObject
             Resource: !Join
-              - ''
-              - - 'arn:aws:s3:::'
+              - ""
+              - - "arn:aws:s3:::"
                 - !Ref ProductOptimizedImageBucket
-                - '/*'
-            Principal: '*'
+                - "/*"
+            Principal: "*"
 
   S3UploadEventRule:
     Type: AWS::Events::Rule
@@ -156,7 +203,7 @@ Resources:
         detail:
           bucket:
             name:
-              - !Ref ProductImageBucket 
+              - !Ref ProductImageBucket
       Targets:
         - Arn: !GetAtt ProductAppFunction.Arn
           Id: S3UploadLambdaTarget
@@ -182,23 +229,28 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: "true"
-  
+
 Outputs:
+  ServerlessHttpApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
   CreateProductApi:
     Description: "Create API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product"
 
   GetProductsApi:
     Description: "Get API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/products"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/products"
 
   DeleteProductApi:
     Description: "Delete API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/{productId}"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/{productId}"
 
   UploadProductApi:
     Description: "Upload API endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/upload"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/upload"
 
   ProductAppFunction:
     Description: Product App Function ARN
