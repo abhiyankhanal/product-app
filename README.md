@@ -30,3 +30,16 @@ I have used node with typescript to implement logic on top of the lambda. This L
 | `/product/{productId}`      | `DELETE`   | Delete a product by its `productId`                                        | `{"message": "Product deleted successfully"}`                                          | `{"message": "Error deleting product"}`                                                |
 | `/product/upload`           | `POST`     | Upload an image for a product with product ID and base64-encoded image       | `{"message": "Product image uploaded successfully", "imageUrl": "..."}`                 | `{"message": "Error:", "error": "..."}`                                                 |
 | Event from S3 Upload        | N/A        | Triggered when an image is uploaded to S3                                   | -                                                                                       | -                                                                                        |
+
+## Screenshots
+### Create Product
+<img width="706" alt="image" src="screenshots/CreateProduct.png">
+
+### Create Product UI
+<img width="706" alt="image" src="screenshots/AddProduct.png">
+
+### Product List UI
+<img width="706" alt="image" src="screenshots/ProductList.png">
+
+### API Key UI
+<img width="706" alt="image" src="screenshots/Forbidden.png">
