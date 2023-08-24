@@ -30,14 +30,14 @@ export const createProduct = async (
             })
             .promise();
 
-        const response =  {
+        const response = {
             statusCode: 200,
             body: JSON.stringify({ message: 'Product created successfully' }),
         };
         return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error creating product:', error);
-        const response =  {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error creating product' }),
         };
@@ -84,14 +84,14 @@ export const deleteProduct = async (
             })
             .promise();
 
-        const response =  {
+        const response = {
             statusCode: 200,
             body: JSON.stringify({ message: 'Product deleted successfully' }),
         };
         return createResponseWithCorsHeaders(response);
     } catch (error) {
         console.error('Error deleting product:', error);
-        const response =  {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({ message: 'Error deleting product' }),
         };
@@ -123,12 +123,14 @@ export const uploadProductImage = async (
         };
 
         // Form the URL of the uploaded image
-        const productImageUri = `https://${process.env.DESTINATION_BUCKET??'20230820-product-optimized-image-bucket'}.s3.amazonaws.com/resized-${uploadParams.Key}`;
+        const productImageUri = `https://${
+            process.env.DESTINATION_BUCKET ?? '20230820-product-optimized-image-bucket'
+        }.s3.amazonaws.com/resized-${uploadParams.Key}`;
 
         const command = new PutObjectCommand(uploadParams);
 
         await s3.send(command);
-        console.info(`succesfully uploaded original image to s3`)
+        console.info(`succesfully uploaded original image to s3`);
 
         const params = {
             TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
@@ -146,8 +148,8 @@ export const uploadProductImage = async (
         try {
             const data = await dynamoDB.update(params).promise();
             console.log(`updated data to dynamo db`);
-            
-            const response =  {
+
+            const response = {
                 statusCode: 200,
                 body: JSON.stringify({
                     message: 'Product image uploaded successfully',
@@ -169,7 +171,7 @@ export const uploadProductImage = async (
         }
     } catch (error) {
         console.error('Error while uploading original image:', error);
-        const response =  {
+        const response = {
             statusCode: 500,
             body: JSON.stringify({
                 message: 'Error:',
@@ -212,7 +214,7 @@ export const createThumbnail = async (
 
     try {
         output_buffer = await sharp(content_buffer).resize(width).toBuffer();
-        console.info('resizing....')
+        console.info('resizing....');
     } catch (error) {
         console.error(error);
         return;
@@ -272,7 +274,7 @@ const putObjectToS3 = async (destination: { bucket: string; key: string }, strea
     console.log('sent');
 };
 
-const createResponseWithCorsHeaders = (response: APIGatewayProxyResult): Promise<APIGatewayProxyResult> => {
+export const createResponseWithCorsHeaders = (response: APIGatewayProxyResult): Promise<APIGatewayProxyResult> => {
     return Promise.resolve({
         ...response,
         headers: {

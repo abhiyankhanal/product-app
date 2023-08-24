@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
+import { AiFillPlusCircle } from "react-icons/ai";
 import ReactModal from "react-modal";
 import {
   UseMutationResult,
@@ -20,14 +20,10 @@ const PLACEHOLDER_IMG_URL = `https://via.placeholder.com/150`;
 
 const ProductList = (): JSX.Element => {
   ReactModal.setAppElement("#root");
-  const {
-    data: products,
-    error,
-    isError,
-    isLoading,
-  }: UseQueryResult<IProductType[], Error> = useQuery({
+  const apiKey = localStorage.getItem('X-Api-Key');
+  const productListQuery: UseQueryResult<IProductType[], Error> = useQuery({
     queryKey: ["products"],
-    queryFn: () => fetchProduct(),
+    queryFn: () => fetchProduct(apiKey!),
   });
 
   const [showForm, setShowForm] = useState(false);
@@ -35,7 +31,7 @@ const ProductList = (): JSX.Element => {
 
   const deleteProductMutation: UseMutationResult<void, Error, string> =
     useMutation({
-      mutationFn: (productId: string) => deleteProduct(productId),
+      mutationFn: (productId: string) => deleteProduct(productId, apiKey!),
       onSuccess: () => {
         queryClient.invalidateQueries(["products"]);
       },
@@ -43,6 +39,10 @@ const ProductList = (): JSX.Element => {
 
   if (deleteProductMutation.isLoading) {
     return <Loading />;
+  }
+
+  if (productListQuery.isError) {
+    <ErrorModal error={productListQuery.error} onClose={() => null}></ErrorModal>;
   }
 
   if (deleteProductMutation.isError) {
@@ -56,15 +56,15 @@ const ProductList = (): JSX.Element => {
 
   let productsForUI: IProductType[];
   productsForUI = dummyProducts;
-  if (isLoading) {
+  if (productListQuery.isLoading) {
     productsForUI = dummyProducts;
-  } else if (products) {
-    productsForUI = products;
+  } else if (productListQuery.data) {
+    productsForUI = productListQuery.data;
   }
-  if (isError) return <span>Error: {error.message}</span>;
+
   const handleRefresh = () => {
     queryClient.invalidateQueries(["products"]);
-  };
+  }
 
   return (
     <>
@@ -85,7 +85,7 @@ const ProductList = (): JSX.Element => {
           },
         }}
       >
-        <ProductForm cancelForm={() => setShowForm(false)} />
+        <ProductForm cancelForm={() => setShowForm(false)}/>
       </ReactModal>
 
       <button
@@ -95,17 +95,17 @@ const ProductList = (): JSX.Element => {
         <AiFillPlusCircle className="text-2xl text-white" />
       </button>
       <div className="container">
-      <div className="text-center mx-2 mt-5">
-      <div className="flex items-center justify-center mb-5">
-        <h2 className="text-3xl font-bold text-gray-700">Products</h2>
-        <button
-          className="px-4 mx-2 py-2 bg-gray-700 text-white rounded hover:bg-blue-600"
-          onClick={handleRefresh}
-        >
-          Refresh
-        </button>
-      </div>
-      </div>
+        <div className="text-center mx-2 mt-5">
+          <div className="flex items-center justify-center mb-5">
+            <h2 className="text-3xl font-bold text-gray-700">Products</h2>
+            <button
+              className="px-4 mx-2 py-2 bg-gray-700 text-white rounded hover:bg-blue-600"
+              onClick={handleRefresh}
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

@@ -1,13 +1,13 @@
 
 import { QueryClient, QueryClientProvider } from "react-query";
-import ProductList from "./ProductList";
+import { APIKeyInput } from "./Authentication";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ProductList />
+      <APIKeyInput />
     </QueryClientProvider>
   );
 }

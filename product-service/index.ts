@@ -1,5 +1,12 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
-import { createProduct, createThumbnail, deleteProduct, getAllProducts, uploadProductImage } from './controller';
+import {
+    createProduct,
+    createResponseWithCorsHeaders,
+    createThumbnail,
+    deleteProduct,
+    getAllProducts,
+    uploadProductImage,
+} from './controller';
 import dynamodb from 'aws-sdk/clients/dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 
@@ -22,10 +29,12 @@ const s3 = new S3Client({});
 
 export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> => {
     let response: Promise<APIGatewayProxyResult>;
-    const notFound = Promise.resolve({
+    const notFound = {
         statusCode: 400,
         body: JSON.stringify({ message: 'Path not found' }),
-    });
+    };
+    const notFoundeResponse = createResponseWithCorsHeaders(notFound);
+
     //create product with empty image
     if (event.httpMethod === 'POST' && event.path === '/product') {
         response = createProduct(event, dynamoDB);
@@ -75,5 +84,5 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
 
         createThumbnail({ bucket: srcBucket, key: srcKey }, { bucket: dstBucket, key: dstKey }, s3);
     }
-    return notFound;
+    return notFoundeResponse;
 };

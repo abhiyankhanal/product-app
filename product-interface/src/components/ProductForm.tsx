@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  ICreateProductType,
   IProductType,
   IUploadImageInterface,
   createProduct,
@@ -13,6 +14,8 @@ interface IProductFormProps {
 }
 
 const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
+  const apiKey = localStorage.getItem('X-Api-Key');
+  console.log(`API key here`, apiKey)
   const queryClient = useQueryClient();
   const [product, setProduct] = useState<IProductType>({
     ProductId: "",
@@ -24,6 +27,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
   const [uploadData, setUploadData] = useState<IUploadImageInterface>({
     productId: "",
     image: "",
+    apiKey: apiKey!
   });
 
   const uploadImageMutation: UseMutationResult<
@@ -34,13 +38,12 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     mutationFn: uploadImage,
     onSuccess: () => {
       setTimeout(() => {
-        // Invalidate the "products" query after waiting for 10 seconds
         queryClient.invalidateQueries(["products"]);
       }, 10000);
     },
   });
 
-  const createProductMutation: UseMutationResult<void, Error, IProductType> =
+  const createProductMutation: UseMutationResult<void, Error, ICreateProductType, string> =
     useMutation({
       mutationFn: createProduct,
       onSuccess: () => {
@@ -60,8 +63,9 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     uploadImageMutation.mutate({
       image: uploadData.image,
       productId: product.ProductId,
+      apiKey: apiKey!
     });
-    createProductMutation.mutate(product);
+    createProductMutation.mutate({...product, apiKey});
     cancelForm();
   };
 

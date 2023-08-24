@@ -3,9 +3,8 @@ export interface IProductType {
   ProductId: string;
   ProductName: string;
   ProductDescription: string;
-  ProductImageUri: string|null;
+  ProductImageUri: string | null;
 }
-
 
 let dummyProducts: IProductType[] = [
   {
@@ -17,42 +16,75 @@ let dummyProducts: IProductType[] = [
 ];
 
 // const BASE_URI = `http://127.0.0.1:3000`; //local
-const BASE_URI = `https://9a94xfutb7.execute-api.us-east-1.amazonaws.com/Prod`; //prod
+const BASE_URI = `https://hijplpidac.execute-api.us-east-1.amazonaws.com/Prod`; //prod
 
-export const fetchProduct = async (): Promise<IProductType[]> => {
-  const res = await Axios.get(`${BASE_URI}/products`);
+export const fetchProduct = async (apiKey: string): Promise<IProductType[]> => {
+  const res = await Axios.get(`${BASE_URI}/products`, {
+    headers: { 
+      "X-Api-Key": apiKey,
+      "Accept": "X-Api-Key, Content-Type", 
+      "Content-Type": "application/json"
+    },
+  });
   return res.data;
 };
 
-export const deleteProduct = async (productId: string): Promise<any> => {
-  const res = await Axios.delete(`${BASE_URI}/product/${productId}`);
+export const deleteProduct = async (
+  productId: string,
+  apiKey: string
+): Promise<any> => {
+  const res = await Axios.delete(`${BASE_URI}/product/${productId}`, {
+    headers: { 
+      "X-Api-Key": apiKey,
+      "Accept": "Content-Type", 
+      "Content-Type": "application/json"
+    },
+  });
   return res.data;
 };
 
-export const createProduct = async (product: IProductType): Promise<any> => {
+export interface ICreateProductType extends IProductType {
+  apiKey: string|null;
+}
+export const createProduct = async (
+  createProductParams: ICreateProductType
+): Promise<any> => {
   const requestBody = {
-    productId: product.ProductId,
-    productName: product.ProductName,
-    productDescription: product.ProductDescription,
-    productImageUri: product.ProductImageUri,
+    productId: createProductParams.ProductId,
+    productName: createProductParams.ProductName,
+    productDescription: createProductParams.ProductDescription,
+    productImageUri: createProductParams.ProductImageUri
   };
-  const res = await Axios.post(`${BASE_URI}/product`, requestBody);
+  const res = await Axios.post(`${BASE_URI}/product`, requestBody, {
+    headers: { 
+      "X-Api-Key": createProductParams.apiKey, 
+      "Accept": "Content-Type", 
+      "Content-Type": "application/json"
+    },
+  });
   return res.data;
 };
 
-export interface IUploadImageInterface{
-  productId: string
-  image: string
+export interface IUploadImageInterface {
+  productId: string;
+  image: string;
+  apiKey?: string;
 }
 export const uploadImage = async (
- imageData: IUploadImageInterface
+  imageData: IUploadImageInterface
 ): Promise<any> => {
-  const requestBody: IUploadImageInterface = {
+  const uploadParams: IUploadImageInterface = {
     productId: imageData.productId,
     image: imageData.image,
   };
-  console.log(requestBody)
-  const res = await Axios.post(`${BASE_URI}/product/upload`, requestBody);
+
+  const res = await Axios.post(`${BASE_URI}/product/upload`, uploadParams, {
+    headers: { 
+      "X-Api-Key": imageData.apiKey, 
+        "Accept": "Content-Type", 
+        "Content-Type": "application/json"
+    },
+  });
   return res.data;
 };
 

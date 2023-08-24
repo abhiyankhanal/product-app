@@ -1,18 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Sample SAM Template for simple-product-app
+Description: SAM template for simple-product-app
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
     MemorySize: 128
-
-  Api:
-    Cors:
-      AllowOrigin: "'*'"
-      AllowMethods: "'OPTIONS,GET,PUT,POST,DELETE'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
 
 Resources:
   ProductDynamoDBTable:
@@ -45,7 +39,13 @@ Resources:
     Properties:
       StageName: Prod
       Auth:
-        ApiKeyRequired: true # sets for all methods
+        ApiKeyRequired: true
+      Cors:
+        AllowMethods: "'OPTIONS,GET,PUT,POST,DELETE'"
+        AllowHeaders: "'X-Forwarded-For, Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'http://localhost.com, https://abhiyankhanal.github.io/product-app'"
+        MaxAge: "'600'"
+        AllowCredentials: true
 
   ApiKey:
     Type: AWS::ApiGateway::ApiKey
@@ -70,7 +70,7 @@ Resources:
           Stage: Prod
       Description: !Join [" ", [{ "Ref": "AWS::StackName" }, "usage plan"]]
       Quota:
-        Limit: 1000
+        Limit: 100000
         Period: MONTH
       UsagePlanName: !Join ["", [{ "Ref": "AWS::StackName" }, "-usage-plan"]]
 
