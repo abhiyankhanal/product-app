@@ -32,6 +32,9 @@ I have used node with typescript to implement logic on top of the lambda. This L
 | Event from S3 Upload        | N/A        | Triggered when an image is uploaded to S3                                   | -                                                                                       | -                                                                                        |
 
 ## Screenshots
+### Forbidden UI
+<img width="706" alt="image" src="screenshots/ApiKey.png">
+
 ### Create Product
 <img width="706" alt="image" src="screenshots/CreateProduct.png">
 
@@ -41,5 +44,5 @@ I have used node with typescript to implement logic on top of the lambda. This L
 ### Product List UI
 <img width="706" alt="image" src="screenshots/ProductList.png">
 
-### API Key UI
-<img width="706" alt="image" src="screenshots/Forbidden.png">
+### Forbidden UI
+<img width="706" alt="image" src="screenshots/Forbiden.png">
