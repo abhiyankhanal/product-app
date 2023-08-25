@@ -68,10 +68,6 @@ const ProductList = (): JSX.Element => {
     productsForUI = productListQuery.data;
   }
 
-  const handleRefresh = () => {
-    queryClient.invalidateQueries(["products"]);
-  };
-
   return (
     <>
       <ReactModal
@@ -104,12 +100,6 @@ const ProductList = (): JSX.Element => {
         <div className="text-center mx-2 mt-5">
           <div className="flex items-center justify-center mb-5">
             <h2 className="text-3xl font-bold text-gray-700">Products</h2>
-            <button
-              className="px-4 mx-2 py-2 bg-gray-700 text-white rounded hover:bg-blue-600"
-              onClick={handleRefresh}
-            >
-              Refresh
-            </button>
           </div>
         </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">

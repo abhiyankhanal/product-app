@@ -74,7 +74,14 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File size should be below 2MB.");
+        event.target.value = "";
+        return;
+      }
+  
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target) {
@@ -88,6 +95,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
       reader.readAsDataURL(file);
     }
   };
+  
 
   return (
     <>

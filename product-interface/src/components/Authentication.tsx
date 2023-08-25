@@ -1,12 +1,11 @@
-import { FormEvent, useState } from "react";
-
-import ProductList from "./ProductList";
+import { FormEvent, useState, useEffect } from "react";
 import { UseMutationResult, useMutation } from "react-query";
+import ProductList from "./ProductList";
 import { IProductType, fetchProduct } from "../data/apicalls";
 
-
 export const APIKeyInput = () => {
-  const [apiKey, setApiKey] = useState<string>("");
+  const storedApiKey = localStorage.getItem("X-Api-Key") || "";
+  const [apiKey, setApiKey] = useState<string>(storedApiKey);
   const [showProductList, toggleProductListPage] = useState<boolean>(false);
 
   const authenticationMutation: UseMutationResult<
@@ -20,6 +19,14 @@ export const APIKeyInput = () => {
       toggleProductListPage(true);
     },
   });
+
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem("X-Api-Key");
+
+    if (storedApiKey) {
+      authenticationMutation.mutate(storedApiKey);
+    }
+  }, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +50,7 @@ export const APIKeyInput = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                className="w-full bg-gray-600 text-white py-2 rounded-md hover:bg-blue-700"
               >
                 Submit
               </button>
