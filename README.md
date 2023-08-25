@@ -31,6 +31,13 @@ I have used node with typescript to implement logic on top of the lambda. This L
 | `/product/upload`           | `POST`     | Upload an image for a product with product ID and base64-encoded image       | `{"message": "Product image uploaded successfully", "imageUrl": "..."}`                 | `{"message": "Error:", "error": "..."}`                                                 |
 | Event from S3 Upload        | N/A        | Triggered when an image is uploaded to S3                                   | -                                                                                       | -                                                                                        |
 
+## Deployment
+- Deploy backend using aws sam, go to root of the project and build using `sam build` and deploy using `sam deploy --guided`
+
+- To deploy FE, checkout [github-repo](https://github.com/abhiyankhanal/Interface) and deploy to github pages
+
+## Postman
+- Find the postman collection in the repo.
 ## Screenshots
 ### Forbidden UI
 <img width="706" alt="image" src="screenshots/ApiKey.png">
