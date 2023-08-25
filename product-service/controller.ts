@@ -1,4 +1,3 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import AWS from 'aws-sdk';
 import {
     S3Client,
@@ -8,8 +7,10 @@ import {
     GetObjectCommandOutput,
     GetObjectCommandInput,
 } from '@aws-sdk/client-s3';
-import { Readable } from 'stream';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+
 import sharp from 'sharp';
+import { Readable } from 'stream';
 
 export const createProduct = async (
     event: APIGatewayProxyEvent,
@@ -147,7 +148,7 @@ export const uploadProductImage = async (
 
         try {
             await dynamoDB.update(params).promise();
-            console.log(`updated data to dynamo db`);
+            console.info(`updated data to dynamo db`);
 
             const response = {
                 statusCode: 200,
@@ -254,7 +255,7 @@ const getObjectFromS3 = async (
     try {
         data = await client.send(new GetObjectCommand(params));
     } catch (err) {
-        console.log('Error', err);
+        console.error('Error', err);
     }
     return data;
 };
@@ -266,13 +267,12 @@ const putObjectToS3 = async (destination: { bucket: string; key: string }, strea
         Body: streamData,
         ContentType: 'image/jpeg',
     };
-    console.log('dest param');
+
     try {
         await client.send(new PutObjectCommand(destparams));
     } catch (err) {
-        console.log('Error', err);
+        console.error('Error', err);
     }
-    console.log('sent');
 };
 
 export const createResponseWithCorsHeaders = (response: APIGatewayProxyResult): Promise<APIGatewayProxyResult> => {

@@ -1,4 +1,7 @@
+import { S3Client } from '@aws-sdk/client-s3';
+import dynamodb from 'aws-sdk/clients/dynamodb';
 import { APIGatewayProxyResult } from 'aws-lambda';
+
 import {
     createProduct,
     createResponseWithCorsHeaders,
@@ -7,9 +10,6 @@ import {
     getAllProducts,
     uploadProductImage,
 } from './controller';
-import dynamodb from 'aws-sdk/clients/dynamodb';
-import { S3Client } from '@aws-sdk/client-s3';
-
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -64,7 +64,6 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         console.info(`Reading options from event:\n ${JSON.stringify(event)}`);
         const srcBucket = event.detail.bucket.name;
 
-        // Object key may have spaces or unicode non-ASCII characters
         const srcKey = decodeURIComponent(event.detail.object.key.replace(/\+/g, ' '));
         const dstBucket = process.env.DESTINATION_BUCKET ?? '20230820-product-optimized-image-bucket';
         const dstKey = 'resized-' + srcKey;
@@ -72,14 +71,14 @@ export const lambdaHandler = async (event: any): Promise<APIGatewayProxyResult> 
         // Infer the image type from the file suffix
         const typeMatch = srcKey.match(/\.([^.]*)$/);
         if (!typeMatch) {
-            console.log('Could not determine the image type.');
+            console.info('Could not determine the image type.');
             return notFound;
         }
 
         // Check that the image type is supported
         const imageType = typeMatch[1].toLowerCase();
         if (imageType != 'jpg' && imageType != 'jpeg') {
-            console.log(`Unsupported image type: ${imageType}`);
+            console.info(`Unsupported image type: ${imageType}`);
             return notFound;
         }
 
