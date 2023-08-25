@@ -37,6 +37,8 @@ I have used node with typescript to implement logic on top of the lambda. This L
 
 - To deploy FE, checkout [github-repo](https://github.com/abhiyankhanal/Interface) and deploy to github pages
 
+Interface app available at: https://abhiyankhanal.github.io/Interface/
+
 ## Postman
 - Find the postman collection in the repo.
 ## Screenshots
