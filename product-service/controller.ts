@@ -22,7 +22,7 @@ export const createProduct = async (
             .put({
                 TableName: process.env?.PRODUCT_TABLE ?? 'ProductTable',
                 Item: {
-                    ProductId: requestBody?.productId ?? '0',
+                    ProductId: requestBody?.productId ?? '',
                     ProductName: requestBody.productName ?? '',
                     ProductDescription: requestBody.productDescription ?? '',
                     ProductImageUri: requestBody.productImageUri ?? '',

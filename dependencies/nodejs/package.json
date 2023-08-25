@@ -5,6 +5,7 @@
   "main": "index.js",
   "author": "abhiyan",
   "license": "ISC",
+  "install-arm": "npm install --prefix /tmp/sharp --arch=arm64 --platform=linux sharp && cp -R /tmp/sharp/node_modules/sharp node_modules/",
   "dependencies": {
     "sharp": "^0.32.1"
   }
