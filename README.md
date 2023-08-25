@@ -13,6 +13,7 @@ This AWS SAM (Serverless Application Model) template is designed to create a sim
 
 ## Followed some good practices like:
 - Principle of mimimum permission to the resource.
+- Used runtime configuration for lambda.
 - Used API Key for securing api keys, used policy to limit the rates.
 - Initialized aws sdk and some heavy dependencies outside the handler.
 - Made seperate layer for image processing.
@@ -32,14 +33,14 @@ I have used node with typescript to implement logic on top of the lambda. This L
 | Event from S3 Upload        | N/A        | Triggered when an image is uploaded to S3                                   | -                                                                                       | -                                                                                        |
 
 ## Deployment
-- Deploy backend using aws sam, go to root of the project and build using `sam build` and deploy using `sam deploy --guided`
+- Deploy backend using aws sam, go to root of the project and build using `sam build` and deploy using `sam deploy --guided`, prerequisite: `aws sam cli`
 
 - To deploy FE, checkout [github-repo](https://github.com/abhiyankhanal/Interface) and deploy to github pages
 
 ## Postman
 - Find the postman collection in the repo.
 ## Screenshots
-### Forbidden UI
+### Auth UI
 <img width="706" alt="image" src="screenshots/ApiKey.png">
 
 ### Create Product
