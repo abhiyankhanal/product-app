@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { AiFillPlusCircle } from "react-icons/ai";
 import ReactModal from "react-modal";
+
+import { AiFillPlusCircle } from "react-icons/ai";
+
 import {
   UseMutationResult,
   UseQueryResult,
@@ -8,11 +10,13 @@ import {
   useQuery,
   useQueryClient,
 } from "react-query";
+
 import dummyProducts, {
   fetchProduct,
   IProductType,
   deleteProduct,
 } from "../data/apicalls";
+
 import ProductForm from "./ProductForm";
 import { ErrorModal, Loading } from "./UtilsUI";
 
@@ -41,7 +45,10 @@ const ProductList = (): JSX.Element => {
   }
 
   if (productListQuery.isError) {
-    <ErrorModal error={productListQuery.error} onClose={() => null}></ErrorModal>;
+    <ErrorModal
+      error={productListQuery.error}
+      onClose={() => null}
+    ></ErrorModal>;
   }
 
   if (deleteProductMutation.isError) {
@@ -63,7 +70,7 @@ const ProductList = (): JSX.Element => {
 
   const handleRefresh = () => {
     queryClient.invalidateQueries(["products"]);
-  }
+  };
 
   return (
     <>
@@ -84,7 +91,7 @@ const ProductList = (): JSX.Element => {
           },
         }}
       >
-        <ProductForm cancelForm={() => setShowForm(false)}/>
+        <ProductForm cancelForm={() => setShowForm(false)} />
       </ReactModal>
 
       <button

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { UseMutationResult, useMutation, useQueryClient } from "react-query";
+
 import {
   ICreateProductType,
   IProductType,
@@ -6,8 +8,9 @@ import {
   createProduct,
   uploadImage,
 } from "../data/apicalls";
-import { UseMutationResult, useMutation, useQueryClient } from "react-query";
+
 import { ErrorModal, Loading } from "./UtilsUI";
+
 
 interface IProductFormProps {
   cancelForm: () => void;
@@ -40,20 +43,24 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
     },
   });
 
-  const createProductMutation: UseMutationResult<void, Error, ICreateProductType> =
-    useMutation({
-      mutationFn: createProduct,
-      onSuccess: () => {
-        queryClient.invalidateQueries(["products"]);
-      },
-    });
+  const createProductMutation: UseMutationResult<
+    void,
+    Error,
+    ICreateProductType
+  > = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
 
-  createProductMutation.isLoading && <Loading />
-  createProductMutation.isError &&
+  createProductMutation.isLoading && <Loading />;
+  createProductMutation.isError && (
     <ErrorModal
       error={createProductMutation.error}
       onClose={() => createProductMutation.reset()}
-    ></ErrorModal>;
+    ></ErrorModal>
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,7 +81,7 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
           const base64Image = e.target.result;
           setUploadData((uploadData) => ({
             ...uploadData,
-            image: String(base64Image)
+            image: String(base64Image),
           }));
         }
       };
@@ -148,7 +155,10 @@ const ProductForm = ({ cancelForm }: IProductFormProps): JSX.Element => {
           />
         </div>
 
-        <button className="py-2 px-4 bg-gray-600 text-white rounded hover:bg-gray-700 mr-2" disabled={uploadImageMutation.isLoading}>
+        <button
+          className="py-2 px-4 bg-gray-600 text-white rounded hover:bg-gray-700 mr-2"
+          disabled={uploadImageMutation.isLoading}
+        >
           Submit
         </button>
         <button
