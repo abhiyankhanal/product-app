@@ -1,0 +1,450 @@
+{
+	"info": {
+		"_postman_id": "43e5a0f3-b732-420f-b424-24f8a12c1ba8",
+		"name": "Serverless Product",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14715688"
+	},
+	"item": [
+		{
+			"name": "Ceate Product",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "x-api-key",
+						"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": \"10028\",\n    \"productName\": \"Playstation9\",\n    \"productDescription\":\"Real test3\",\n    \"productImageUri\":\"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URI}}/product",
+					"host": [
+						"{{BASE_URI}}"
+					],
+					"path": [
+						"product"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Ceate Product",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "x-api-key",
+								"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"10028\",\n    \"productName\": \"Playstation9\",\n    \"productDescription\":\"Real test3\",\n    \"productImageUri\":\"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URI}}/product",
+							"host": [
+								"{{BASE_URI}}"
+							],
+							"path": [
+								"product"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.3.6 Python/3.11.4"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 25 Aug 2023 03:26:55 GMT"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, DELETE, OPTIONS"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "42"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Product created successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "List Product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URI}}/products",
+					"host": [
+						"{{BASE_URI}}"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "List Product",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URI}}/products",
+							"host": [
+								"{{BASE_URI}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Fri, 25 Aug 2023 03:47:39 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "418"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "0d2f4e0c-bc6d-40b7-8400-38df5dd2f6bc"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "KMqeUFpoIAMEdCw="
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, DELETE, OPTIONS"
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-64e8245b-008ebb5a1d743837786576bc;Sampled=0;lineage=6402fd3a:0"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"ProductId\": \"13\",\n        \"ProductImageUri\": \"https://20230820-product-optimized-image-bucket.s3.amazonaws.com/resized-1692902708078.jpg\",\n        \"ProductName\": \"Watch\",\n        \"ProductDescription\": \"Premium watch for mens\"\n    },\n    {\n        \"ProductId\": \"12\",\n        \"ProductImageUri\": \"https://20230820-product-optimized-image-bucket.s3.amazonaws.com/resized-1692889272245.jpg\",\n        \"ProductName\": \"Iphone\",\n        \"ProductDescription\": \"Iphone was designed by Apple in california\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Delete Product",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URI}}/product/:productId",
+					"host": [
+						"{{BASE_URI}}"
+					],
+					"path": [
+						"product",
+						":productId"
+					],
+					"variable": [
+						{
+							"key": "productId",
+							"value": "10028"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Delete Product",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URI}}/product/:productId",
+							"host": [
+								"{{BASE_URI}}"
+							],
+							"path": [
+								"product",
+								":productId"
+							],
+							"variable": [
+								{
+									"key": "productId",
+									"value": "10028"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Fri, 25 Aug 2023 03:47:35 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "42"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "5ed3f637-353d-411b-ba4d-e2fdb9038d7b"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "KMqdjFoSoAMEBww="
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, DELETE, OPTIONS"
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-64e82456-1802392c1ca6240e20423429;Sampled=0;lineage=6402fd3a:0"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Product deleted successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Upload",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": \"10028\",\n    \"image\":\"/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEBAQEBIPEBAPDw8PDw8PDw8NDw8NFREWFhURFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OFQ8QFy0dFR0rLSsrLS0rKysrLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tKystNy03Ky0tNy0rKzctK//AABEIAMIBAwMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBAACBQEGB//EADEQAAICAQMDAwMEAQMFAAAAAAABAgMRBCExEkFRBRNhFCJxMoGRsaEG0fAVFiNCU//EABkBAQEBAQEBAAAAAAAAAAAAAAEAAgMEBf/EACARAQEBAQEAAgIDAQAAAAAAAAABEQISAyExYRNBURT/2gAMAwEAAhEDEQA/ANxyIpA2ziZ63IwpBIzFYyCRkAMwnuFlMWqLS5Ii2Ng8nZTKMg5OwC7i1kdhSbHEbjeFhcZimXjaGLWzXcXVhlV3h46gMOnpWC87QM9QLytKRWmHYTrFVMupGsBlMLABTuFs+3nYEzr6J+43DbA1TlL7nv3LuxC07jX5RzrOGbLV7pLLy8bC+o1tsHhRlN7/AKU3tjJTi0XppauEZLEv4Eq6lFtrH47GfR6sp5c/taCq5vjO22fJvzZ9M+pTlmpwt/4AavEovPgHRXl77v8AwvwE1KXBZlTCcIt/bs1+6FLdHy8rPge1mISWO/YBqbE1tzyeiWudZkonAk0VcTqwqQ7ggp9DkiuBqdQFxPmvWokFicSOpEBoMvyCiHrBLOrYqqwzKtkS9uyM600LhScMjGaTZMh5wwDk1/IhEy6kToOuJJzqOoiQauIFyFbZdwa2D1RQdxWQ04Dpo7m3b6dG2tdWcr5a3MulJPL7HoNPqU1hdkFpjyfqPp1kItqa6s7JrsIKL7vLNz1W1ym/C/syJLc6S/TFG0VS6uP4PRaV1pZePG5gad4aNSmjqzl7cmemonqv+m6Lk5pdMnv1w2b/ANzz8/QLIR6oSdjz+lpLP7nuNNHbHhdwUUs4ynuU+Sz6V5lePt9MshCUtsqPV0r8b7mE/Ul35Z9PtgscZPlPq/p9ittkoT6Pdnh9OFznb4O3xWdbrn3LPwU19/VPKAQns0+5Vrn45OHqk+nHVZ8nC2Byr0u6UVKNcmpfpeOR2REcEHv+lXf/ACs5a/S+UyB6iyvodwBwHrKvACyo+a9dKYCwr2L+xgkpDoUaLwBl0yQvUcZWLOSZJS1A+ks2UkSDlDID2hhMHJ7Ggpk45FZMrggLFhYsWTCwkBN1jSQlWxiM2ZI3Qafp0fte+f7RlLVYWGkwtWsaTXH4LC15aOLy9jB18F07LDT/AHHK/Unhp+NmKX/pk85bGCg6StSTXdDGji1Lnn+hPS3dLe3KCysbeUNB3UzlHiXPYQeqn2eAltuedxeUChrW9I13VmE3zwx3WaRSXThNM89TDDTXPY9PpZN1rPKX5M36+4Y+d/8AbVk9TKH6a223PGcLnH5Ber/6VspjKyL64xy8Y+7p8n0bTQzn9/7C36VSjKL3Uk4teU0df+jqVj+KPlf+nPSndbFyX/ji8v5a4R9Ip0UUllLK424/Avo/SI0bQWI/yzSgZ+X5PV/R448xT6aPhfwQP7ZDlroySSR1IHbZjk0HJsTnLcM7k+BOzd5GCr5O9QJZk8F5RfAhdSb4JKLL6eGBpJAikqngXkzQtsWDKlblsYKHZZvgi3LwigkICAlUGVAxCKL4DTjNtpwzlcR26OStde5JyuIxCJJ1YKKzAUxd1nVE5G0s5gVcYCSinwCkyrm+whJVFVsFhPOxJxJJCGS/07bwW0sTQpr/AJLSzlp2mjZ0kcY7Z2ZeNK+MotNGbdOCKGGFSAUy5GEzJDvhlCjgPti8o7lEBv5IG6SDqZuSk4JgVadVggC3SJvMXj4+RadLHfdKylkdGFK9gseSSjuDkxA6luVv1CS54FLtSoLOUjM1erymovOe5rnjResMXeoNywuGK2arDSXncQVjhu+Wcql1SWdvk7ziOXpv6aaG4szZNqKS2+SPV9K8nK863rZiySZjv1DC3ylznGwvP1hqW+ye6z3D+O0+43WSlZmvArolZZFSx9r4fGV5DwpalgMxa0rYYBR0edxiNEtu4zCH+DGtFIaFYbE9TW09uDbnshSeGUpwiobHFVhmgqtthaRAFVbh3BFkjirJLUxHa9kKxYzWwpV0973278juSlVSDOsKQsfyEhM64nHDYCvL8gpSKPIpfIZEZd8fKIIdBwcGsiNwRXGb7qKy1WDeM60nYdVplx1afcpZ6lBd9x8Uems7RXWajCeBWvVppNd+47CuMo4aznksz8rdeX1dspvd/g9D6F6XlKUt00tmsjsfTK21LpWUaOmgoo118uzIOeMu0K70mqWG4p4/YDPQwX/rHbjZGhOeReRy9VvIVenj4AS9Mi31Y/2ZpRrJJeBnVGEpaOLTTSw1gytZ6R1OtRwul4fzE3ZV5OTgh57sF5lM6KrEUvCx+wX2UpZQrp7sfaHlYjJOVWZCOWGJ12rAOV+4YTF0wCkCtuyUjMUaVuAeE2AlM5C3DRLT/wBP8h6YLwBq1CYxjuBEVMX2OOkopMPCYJaovK34BzaK9XYC7K1Pbj5CdaBuBWWxIZx2ZnTi22xyFu3SyvShiLRg8cEGcr4IOrHzlTyVvg8FPT5Z5/Z8F/Up9KTW6R6c+8cf60CiDw1nf4EtTppR333JHWNMfnd1xX+Tp981z+qt6M21iX7HodPhGBprUuDTpvOHyfddeWzG1ElcZ3vHPeOWN60FaFjYZ0bQkbCwa0VYVbFFYWjMjpyIDVU5WV2ZISLynsSIOxxeH+xz6hsNYs8lFXjc1rK0LWd9wpkowQ3WWjMBGRbqJDKQtZZ9wTqwAue4xHdPZwa9Nmxh6Oe+5q0TM1qHki0QdUjmosxsYKStJCYt1BVNIUYdgKckUcys2ks5JGIY2z34BSvWcIUsuz/SO1jiGcyAXaiEXzarUvb47BdXqsx/OxlplpTyfQ8TXj9LJoPG3C7iuTuTVmjTML8Map1T8iMUNV4OfUjXNrUr1DCq4zoTCxmeex11o12h4WmZ7mAtF2TPk60+sLCYjGWA9cgwn65hciUGGUjJFZRso5FGyK7RxoopEbII2UlI45Arp4NRLznsUb2AqZdT2Fkeie5p0WmNXLcdosM1qNaFhWVmQCs2OwaMtDwkdnLIPqLRRJ3qA6m/sEmZmpTRRCq0LO/bBnQmXc8jgNe4QW6iEXgFE70l4ssmfR148BwQP+CrXwOjFVM77jIoIvGleQuL7GpntuMQsFY0ryE9p9mcuuZXSWmYT6njsa2niklgwKU0+G2aENQ1sc++f8a5rYWGXrSRlQ1YSOq+TjldNbMZI7KxGatRlCV2vlF42YeVradgOdxiP1GRX6xy2NeB6a71BZTyZ2mW+/ccrsSbz2LCPKzCErrdyXX5fwJ2T3KCmPdO+6J9ZFM0D0bR3SzyZMGO0TwZrUbCtRRXGerA0JGMOtKmY1GRn6djdW4NG4Qyhe7SdTHdPsEm0GnGWvS/+MvX6Z5DWWNvkJVPHJaMAfpyIN9RwtOPkBaMyNHMH1HhW6iNlUjpYlsl4MEdQYtH6fkvCfgXUgtct0ZsalaldX2p+S0q9jsNVHCXwCWo5PNddvpX2wc1gK71gWndkgvG9oDbPLyWjuVtisClOoLQ9wCLweBwNWuX+Ecdq3EY3vOByuCS35OdmNhWWAusrfLcDGQgfqLRYDrOwsJHapBlcIxkEjICehYN1TM2obrZmmNWmew3XYZVVmBqu4xWmvTaSyeTPhcXdgNDSZeExX3PJT3STS944Z3ushYteI9pElQi8Ujp7drz5AFpCtlCQ5CaOShkvVHmEPb+UVcR90IpLTm52z4Jpl4sI9Oc9ofUHmu9RMnPbOdLM5Kdq0mVhIuivtfkxeWpR6p7PIGbyy8YMkYPczh1SMQyoYSinPYdrh5K0yFI6d8nLVI0OnBx/wAmNOMWcvIPqHNXV3xyJOIhxyOqwFI5kCbjcGhaZ6kEhMC1qrQsbjKjaEjaGFuVXIKrfBhRvDQ1JnDrfrvDfUIxadUWeoDDrWlaVlcZy1SB2aksWtH6lEMn6g4OLWYrzq1AGP4LdXwe7zHm2mYSTCJLsxWMy8bUYvLUphwfktFYFFdv3DV2J8v+TN5plhhSizrqJCEe7QdVryc63gK0yZ1aEMo/IaE8B6qyFYaXfhYGYaVeA3WEhMzeq1OYX+mXgLGhPlIJKRX3A2nEjporgkq0VlaBs63sikQkq15RTEV4M3UV2cbgeqcJbnScftzvX6aE6lJv8Ct+i7I59bg59c/GR8dL1CVumaF5VGrZe2t4i/TkcGs6UTiHp1oDbVhJruFilBUiysOdDwDaaM4R1YXVopkspBhOwuwF+oEOotGQYTrsK+4wCkWTJD9RAPWQkqiEIe55hYFXyQhkoDIQYK7kJXJ+WQhVQWuT8sZpk+pEIcunSNJF0Qh53Z1kwQgFfGxHyvwQhJbUGbctyEHkdFZRXhFoohDrWIlou+GdIU/Cocwb4IQ1fwz/AGLWvtAahEIc2ipDhCToWJCGSsSRCEVWdIQE/9k=\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URI}}/product/upload",
+					"host": [
+						"{{BASE_URI}}"
+					],
+					"path": [
+						"product",
+						"upload"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Upload",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "abcdefg123456665ffghsdghfgdhfgdh4565",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"10028\",\n    \"image\":\"/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEBAQEBIPEBAPDw8PDw8PDw8NDw8NFREWFhURFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OFQ8QFy0dFR0rLSsrLS0rKysrLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tKystNy03Ky0tNy0rKzctK//AABEIAMIBAwMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBAACBQEGB//EADEQAAICAQMDAwMEAQMFAAAAAAABAgMRBCExEkFRBRNhFCJxMoGRsaEG0fAVFiNCU//EABkBAQEBAQEBAAAAAAAAAAAAAAEAAgMEBf/EACARAQEBAQEAAgIDAQAAAAAAAAABEQISAyExYRNBURT/2gAMAwEAAhEDEQA/ANxyIpA2ziZ63IwpBIzFYyCRkAMwnuFlMWqLS5Ii2Ng8nZTKMg5OwC7i1kdhSbHEbjeFhcZimXjaGLWzXcXVhlV3h46gMOnpWC87QM9QLytKRWmHYTrFVMupGsBlMLABTuFs+3nYEzr6J+43DbA1TlL7nv3LuxC07jX5RzrOGbLV7pLLy8bC+o1tsHhRlN7/AKU3tjJTi0XppauEZLEv4Eq6lFtrH47GfR6sp5c/taCq5vjO22fJvzZ9M+pTlmpwt/4AavEovPgHRXl77v8AwvwE1KXBZlTCcIt/bs1+6FLdHy8rPge1mISWO/YBqbE1tzyeiWudZkonAk0VcTqwqQ7ggp9DkiuBqdQFxPmvWokFicSOpEBoMvyCiHrBLOrYqqwzKtkS9uyM600LhScMjGaTZMh5wwDk1/IhEy6kToOuJJzqOoiQauIFyFbZdwa2D1RQdxWQ04Dpo7m3b6dG2tdWcr5a3MulJPL7HoNPqU1hdkFpjyfqPp1kItqa6s7JrsIKL7vLNz1W1ym/C/syJLc6S/TFG0VS6uP4PRaV1pZePG5gad4aNSmjqzl7cmemonqv+m6Lk5pdMnv1w2b/ANzz8/QLIR6oSdjz+lpLP7nuNNHbHhdwUUs4ynuU+Sz6V5lePt9MshCUtsqPV0r8b7mE/Ul35Z9PtgscZPlPq/p9ittkoT6Pdnh9OFznb4O3xWdbrn3LPwU19/VPKAQns0+5Vrn45OHqk+nHVZ8nC2Byr0u6UVKNcmpfpeOR2REcEHv+lXf/ACs5a/S+UyB6iyvodwBwHrKvACyo+a9dKYCwr2L+xgkpDoUaLwBl0yQvUcZWLOSZJS1A+ks2UkSDlDID2hhMHJ7Ggpk45FZMrggLFhYsWTCwkBN1jSQlWxiM2ZI3Qafp0fte+f7RlLVYWGkwtWsaTXH4LC15aOLy9jB18F07LDT/AHHK/Unhp+NmKX/pk85bGCg6StSTXdDGji1Lnn+hPS3dLe3KCysbeUNB3UzlHiXPYQeqn2eAltuedxeUChrW9I13VmE3zwx3WaRSXThNM89TDDTXPY9PpZN1rPKX5M36+4Y+d/8AbVk9TKH6a223PGcLnH5Ber/6VspjKyL64xy8Y+7p8n0bTQzn9/7C36VSjKL3Uk4teU0df+jqVj+KPlf+nPSndbFyX/ji8v5a4R9Ip0UUllLK424/Avo/SI0bQWI/yzSgZ+X5PV/R448xT6aPhfwQP7ZDlroySSR1IHbZjk0HJsTnLcM7k+BOzd5GCr5O9QJZk8F5RfAhdSb4JKLL6eGBpJAikqngXkzQtsWDKlblsYKHZZvgi3LwigkICAlUGVAxCKL4DTjNtpwzlcR26OStde5JyuIxCJJ1YKKzAUxd1nVE5G0s5gVcYCSinwCkyrm+whJVFVsFhPOxJxJJCGS/07bwW0sTQpr/AJLSzlp2mjZ0kcY7Z2ZeNK+MotNGbdOCKGGFSAUy5GEzJDvhlCjgPti8o7lEBv5IG6SDqZuSk4JgVadVggC3SJvMXj4+RadLHfdKylkdGFK9gseSSjuDkxA6luVv1CS54FLtSoLOUjM1erymovOe5rnjResMXeoNywuGK2arDSXncQVjhu+Wcql1SWdvk7ziOXpv6aaG4szZNqKS2+SPV9K8nK863rZiySZjv1DC3ylznGwvP1hqW+ye6z3D+O0+43WSlZmvArolZZFSx9r4fGV5DwpalgMxa0rYYBR0edxiNEtu4zCH+DGtFIaFYbE9TW09uDbnshSeGUpwiobHFVhmgqtthaRAFVbh3BFkjirJLUxHa9kKxYzWwpV0973278juSlVSDOsKQsfyEhM64nHDYCvL8gpSKPIpfIZEZd8fKIIdBwcGsiNwRXGb7qKy1WDeM60nYdVplx1afcpZ6lBd9x8Uems7RXWajCeBWvVppNd+47CuMo4aznksz8rdeX1dspvd/g9D6F6XlKUt00tmsjsfTK21LpWUaOmgoo118uzIOeMu0K70mqWG4p4/YDPQwX/rHbjZGhOeReRy9VvIVenj4AS9Mi31Y/2ZpRrJJeBnVGEpaOLTTSw1gytZ6R1OtRwul4fzE3ZV5OTgh57sF5lM6KrEUvCx+wX2UpZQrp7sfaHlYjJOVWZCOWGJ12rAOV+4YTF0wCkCtuyUjMUaVuAeE2AlM5C3DRLT/wBP8h6YLwBq1CYxjuBEVMX2OOkopMPCYJaovK34BzaK9XYC7K1Pbj5CdaBuBWWxIZx2ZnTi22xyFu3SyvShiLRg8cEGcr4IOrHzlTyVvg8FPT5Z5/Z8F/Up9KTW6R6c+8cf60CiDw1nf4EtTppR333JHWNMfnd1xX+Tp981z+qt6M21iX7HodPhGBprUuDTpvOHyfddeWzG1ElcZ3vHPeOWN60FaFjYZ0bQkbCwa0VYVbFFYWjMjpyIDVU5WV2ZISLynsSIOxxeH+xz6hsNYs8lFXjc1rK0LWd9wpkowQ3WWjMBGRbqJDKQtZZ9wTqwAue4xHdPZwa9Nmxh6Oe+5q0TM1qHki0QdUjmosxsYKStJCYt1BVNIUYdgKckUcys2ks5JGIY2z34BSvWcIUsuz/SO1jiGcyAXaiEXzarUvb47BdXqsx/OxlplpTyfQ8TXj9LJoPG3C7iuTuTVmjTML8Map1T8iMUNV4OfUjXNrUr1DCq4zoTCxmeex11o12h4WmZ7mAtF2TPk60+sLCYjGWA9cgwn65hciUGGUjJFZRso5FGyK7RxoopEbII2UlI45Arp4NRLznsUb2AqZdT2Fkeie5p0WmNXLcdosM1qNaFhWVmQCs2OwaMtDwkdnLIPqLRRJ3qA6m/sEmZmpTRRCq0LO/bBnQmXc8jgNe4QW6iEXgFE70l4ssmfR148BwQP+CrXwOjFVM77jIoIvGleQuL7GpntuMQsFY0ryE9p9mcuuZXSWmYT6njsa2niklgwKU0+G2aENQ1sc++f8a5rYWGXrSRlQ1YSOq+TjldNbMZI7KxGatRlCV2vlF42YeVradgOdxiP1GRX6xy2NeB6a71BZTyZ2mW+/ccrsSbz2LCPKzCErrdyXX5fwJ2T3KCmPdO+6J9ZFM0D0bR3SzyZMGO0TwZrUbCtRRXGerA0JGMOtKmY1GRn6djdW4NG4Qyhe7SdTHdPsEm0GnGWvS/+MvX6Z5DWWNvkJVPHJaMAfpyIN9RwtOPkBaMyNHMH1HhW6iNlUjpYlsl4MEdQYtH6fkvCfgXUgtct0ZsalaldX2p+S0q9jsNVHCXwCWo5PNddvpX2wc1gK71gWndkgvG9oDbPLyWjuVtisClOoLQ9wCLweBwNWuX+Ecdq3EY3vOByuCS35OdmNhWWAusrfLcDGQgfqLRYDrOwsJHapBlcIxkEjICehYN1TM2obrZmmNWmew3XYZVVmBqu4xWmvTaSyeTPhcXdgNDSZeExX3PJT3STS944Z3ushYteI9pElQi8Ujp7drz5AFpCtlCQ5CaOShkvVHmEPb+UVcR90IpLTm52z4Jpl4sI9Oc9ofUHmu9RMnPbOdLM5Kdq0mVhIuivtfkxeWpR6p7PIGbyy8YMkYPczh1SMQyoYSinPYdrh5K0yFI6d8nLVI0OnBx/wAmNOMWcvIPqHNXV3xyJOIhxyOqwFI5kCbjcGhaZ6kEhMC1qrQsbjKjaEjaGFuVXIKrfBhRvDQ1JnDrfrvDfUIxadUWeoDDrWlaVlcZy1SB2aksWtH6lEMn6g4OLWYrzq1AGP4LdXwe7zHm2mYSTCJLsxWMy8bUYvLUphwfktFYFFdv3DV2J8v+TN5plhhSizrqJCEe7QdVryc63gK0yZ1aEMo/IaE8B6qyFYaXfhYGYaVeA3WEhMzeq1OYX+mXgLGhPlIJKRX3A2nEjporgkq0VlaBs63sikQkq15RTEV4M3UV2cbgeqcJbnScftzvX6aE6lJv8Ct+i7I59bg59c/GR8dL1CVumaF5VGrZe2t4i/TkcGs6UTiHp1oDbVhJruFilBUiysOdDwDaaM4R1YXVopkspBhOwuwF+oEOotGQYTrsK+4wCkWTJD9RAPWQkqiEIe55hYFXyQhkoDIQYK7kJXJ+WQhVQWuT8sZpk+pEIcunSNJF0Qh53Z1kwQgFfGxHyvwQhJbUGbctyEHkdFZRXhFoohDrWIlou+GdIU/Cocwb4IQ1fwz/AGLWvtAahEIc2ipDhCToWJCGSsSRCEVWdIQE/9k=\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URI}}/product/upload",
+							"host": [
+								"{{BASE_URI}}"
+							],
+							"path": [
+								"product",
+								"upload"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Fri, 25 Aug 2023 03:30:04 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "153"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "31da8db0-089b-4034-8c41-f5f0cc0140dd"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "KMn5aHS1oAMEOpQ="
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, DELETE, OPTIONS"
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-64e8203b-52f4d2f27e5499971291c956;Sampled=0;lineage=6402fd3a:0"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Product image uploaded successfully\",\n    \"imageUrl\": \"https://20230820-product-optimized-image-bucket.s3.amazonaws.com/resized-1692934203997.jpg\"\n}"
+				}
+			]
+		}
+	]
+}
