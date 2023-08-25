@@ -4,8 +4,8 @@ Description: SAM template for simple-product-app
 
 Globals:
   Function:
-    Timeout: 5
-    MemorySize: 128
+    Timeout: 10
+    MemorySize: 1024
 
 Resources:
   ProductDynamoDBTable:
