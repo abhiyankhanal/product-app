@@ -1,6 +1,6 @@
 ## Simple Product App AWS SAM Template
 
-This AWS SAM (Serverless Application Model) template is designed to create a simple product application consisting of features to create, list, and delete products. The application utilizes AWS services such as DynamoDB for storing product data, Amazon S3 for storing images, AWS Lambda for serverless functions, and Amazon EventBridge for event-driven processing. Below is a detailed documentation of the template in Markdown format.
+This AWS SAM (Serverless Application Model) template is designed to create a simple product application consisting of features to create, list, and delete products. The application utilizes AWS services such as DynamoDB for storing product data, Amazon S3 for storing images, AWS Lambda for serverless functions, and Amazon EventBridge for event-driven processing.
 
 <img width="706" alt="image" src="aws-architecture.png">
 
@@ -24,7 +24,7 @@ This AWS SAM (Serverless Application Model) template is designed to create a sim
 ## About Backend Codebase
 I have used node with typescript to implement logic on top of the lambda. This Lambda function serves as the handler for the product application's API Gateway endpoints. It routes incoming requests to appropriate functions for processing and responds accordingly. It also handles events triggered by Amazon S3 uploads, including creating thumbnails of uploaded images. It utilizes AWS SDKs and custom controller functions for various operations.
 
-| **API Endpoint**            | **Method** | **Sample Request**                                                           | **Success Response**                                                                     | **Failure Response**                                                                    |
+| **API Endpoint**            | **Method** | **Description**                                                           | **Success Response**                                                                     | **Failure Response**                                                                    |
 |-----------------------------|------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 | `/product`                  | `POST`     | Create a new product with product details and a base64-encoded image         | `{"message": "Product created successfully"}`                                          | `{"message": "Error creating product"}`                                                |
 | `/products`                 | `GET`      | Get a list of all products                                                 | Array of product objects                                                               | `{"message": "Error retrieving products"}`                                              |
